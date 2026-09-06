@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Chez Nounou</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Chez Nounou">
+<meta name="theme-color" content="#47978A">
+<style>
+:root{
+  --bg:#FBF7F0; --surface:#FFFFFF; --surface-2:#F5EFE6; --ink:#302B25; --muted:#8B8177;
+  --line:#EAE2D6; --teal:#47978A; --teal-d:#37776C; --teal-soft:#E4F0ED;
+  --repas:#EFA636; --sommeil:#4A97E0; --bobo:#E77FAE; --changes:#E0A94E; --ramener:#4A443E; --remarques:#6FBE4E;
+  --danger:#D0553F; --shadow:0 1px 2px rgba(48,43,37,.05),0 6px 18px rgba(48,43,37,.06);
+  --radius:18px;
+}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1C1A17; --surface:#262320; --surface-2:#2F2B27; --ink:#F1EBE1; --muted:#A79E92;
+    --line:#3A352F; --teal:#66B6A8; --teal-d:#7FC7B9; --teal-soft:#22302D;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1C1A17; --surface:#262320; --surface-2:#2F2B27; --ink:#F1EBE1; --muted:#A79E92;
+  --line:#3A352F; --teal:#66B6A8; --teal-d:#7FC7B9; --teal-soft:#22302D;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Nunito",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased; line-height:1.45;
+  overscroll-behavior-y:none;
+}
+h1,h2,h3,.display{font-family:"Fredoka","Nunito",-apple-system,sans-serif;}
+button{font-family:inherit; cursor:pointer}
+.app{max-width:540px; margin:0 auto; min-height:100vh; min-height:100dvh; display:flex; flex-direction:column; background:var(--bg)}
+
+/* Header */
+.top{position:sticky; top:0; z-index:20; background:color-mix(in srgb,var(--bg) 88%,transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
+.top-in{display:flex; align-items:center; gap:12px; padding:14px 16px calc(14px)}
+.brand{display:flex; align-items:center; gap:10px; min-width:0}
+.brand .bear{width:34px;height:34px;flex:0 0 auto}
+.brand .t{min-width:0}
+.brand .t b{font-family:"Fredoka",sans-serif; font-weight:600; font-size:18px; color:var(--teal); letter-spacing:.2px; display:block; line-height:1.05}
+.brand .t span{font-size:12px; color:var(--muted); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-transform:capitalize}
+.top .spacer{flex:1}
+.icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:grid;place-items:center;flex:0 0 auto}
+.icon-btn svg{width:20px;height:20px}
+.back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--teal);font-weight:700;font-size:15px;padding:6px 2px}
+.back svg{width:18px;height:18px}
+
+/* Views */
+main{flex:1; padding:16px 16px 120px}
+.view{display:none; animation:fade .22s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.view,.view.active{animation:none}}
+
+.page-h{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:2px 0 14px}
+.page-h h1{font-size:24px;margin:0;font-weight:600;letter-spacing:.2px}
+.page-h .sub{color:var(--muted);font-size:13.5px;font-weight:600}
+.pill{font-size:12px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);padding:5px 10px;border-radius:999px;white-space:nowrap}
+
+/* Child cards */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:380px){.grid{grid-template-columns:1fr}}
+.child{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);text-align:left;color:inherit;display:flex;flex-direction:column;gap:10px;min-height:112px}
+.child:active{transform:scale(.985)}
+.avatar{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-family:"Fredoka",sans-serif;font-weight:600;font-size:20px;color:#fff;flex:0 0 auto}
+.child .nm{font-weight:800;font-size:16px}
+.child .status{display:flex;gap:5px;flex-wrap:wrap;margin-top:auto}
+.dot{width:16px;height:16px;border-radius:5px;display:grid;place-items:center}
+.dot svg{width:11px;height:11px}
+.child .meta{font-size:12px;color:var(--muted);font-weight:700}
+.badge-demo{position:absolute;top:10px;right:10px;font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);padding:3px 7px;border-radius:999px;text-transform:uppercase}
+.ring{position:absolute;top:12px;right:12px;font-size:11px;font-weight:800;color:var(--muted)}
+.ring.done{color:var(--remarques)}
+
+.addcard{border:2px dashed var(--line);background:transparent;border-radius:var(--radius);padding:14px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--teal);font-weight:800;min-height:112px}
+.addcard svg{width:20px;height:20px}
+
+.empty{text-align:center;padding:36px 18px;color:var(--muted)}
+.empty .bear{width:64px;height:64px;margin:0 auto 10px}
+.empty h2{color:var(--ink);margin:0 0 6px;font-size:20px}
+
+/* Buttons */
+.btn{border:none;border-radius:14px;padding:14px 16px;font-weight:800;font-size:15.5px;display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%}
+.btn svg{width:19px;height:19px}
+.btn-primary{background:var(--teal);color:#fff;box-shadow:0 6px 16px rgba(71,151,138,.28)}
+.btn-primary:active{background:var(--teal-d)}
+.btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn-wa{background:#25D366;color:#0a3d20;box-shadow:0 6px 16px rgba(37,211,102,.28)}
+.btn-row{display:flex;gap:10px}
+.btn-sm{padding:9px 12px;font-size:13.5px;border-radius:11px;width:auto}
+
+/* Section editor */
+.sec{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden}
+.sec-h{display:flex;align-items:center;gap:11px;padding:13px 14px}
+.sec-ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;flex:0 0 auto}
+.sec-ic svg{width:21px;height:21px}
+.sec-h .lbl{font-weight:800;font-size:15px;letter-spacing:.3px;flex:1;text-transform:uppercase}
+.sw{width:46px;height:28px;border-radius:999px;background:var(--line);position:relative;transition:background .18s;flex:0 0 auto;border:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .18s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.sw.on{background:var(--teal)}
+.sw.on::after{transform:translateX(18px)}
+.sec-body{padding:0 14px 14px;display:block}
+.sec.off .sec-body{display:none}
+.sec.off .sec-h{opacity:.55}
+textarea{width:100%;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:12px;padding:11px 12px;font-family:inherit;font-size:15.5px;line-height:1.4;resize:vertical;min-height:64px}
+textarea:focus{outline:none;border-color:var(--teal);background:var(--surface)}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 11px;font-size:13px;font-weight:700}
+.chip:active{background:var(--surface-2)}
+.hint{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px;margin:2px 0 14px;font-weight:600}
+.hint svg{width:15px;height:15px;flex:0 0 auto}
+
+.sticky-actions{position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.sticky-actions .in{max-width:540px;margin:0 auto;display:flex;gap:10px}
+
+/* Fiche (sheet) — always light, it is a document */
+.sheet-wrap{background:#e9e4db;border-radius:var(--radius);padding:14px;overflow:hidden}
+.sheet-scale{transform-origin:top left}
+.sheet{width:794px;min-height:1000px;background:#fff;color:#2E2A26;padding:46px 44px;font-family:"Nunito",sans-serif;box-shadow:0 4px 20px rgba(0,0,0,.12)}
+.sheet .s-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:6px}
+.sheet .s-title{font-family:"Fredoka",sans-serif;font-weight:600;font-size:34px;color:#47978A;letter-spacing:.5px;text-transform:uppercase;line-height:1.05;margin:0}
+.sheet .s-sub{font-weight:800;color:#6b6459;font-size:17px;margin-top:8px;text-transform:capitalize}
+.sheet .s-bear{width:78px;height:78px;flex:0 0 auto}
+.sheet .s-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px 26px;margin-top:26px}
+.sheet .s-sec{display:flex;flex-direction:column;gap:9px}
+.sheet .s-sec.full{grid-column:1 / -1}
+.sheet .s-h{display:flex;align-items:center;gap:10px}
+.sheet .s-h .si{width:30px;height:30px;flex:0 0 auto;display:grid;place-items:center}
+.sheet .s-h .si svg{width:30px;height:30px}
+.sheet .s-h .sl{font-family:"Fredoka",sans-serif;font-weight:600;font-size:20px;letter-spacing:.4px;text-transform:uppercase}
+.sheet .s-box{border-radius:16px;padding:14px 16px;font-size:17px;line-height:1.5;white-space:pre-wrap;min-height:56px;color:#3a352f}
+.sheet .s-foot{margin-top:30px;text-align:center;color:#b4ab9d;font-size:13px;font-weight:700}
+
+/* History */
+.hist-day{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;width:100%;text-align:left;color:inherit}
+.hist-day .d{font-weight:800;font-size:15px;text-transform:capitalize}
+.hist-day .p{font-size:12.5px;color:var(--muted);font-weight:700;margin-top:2px}
+.hist-day .chevrers{margin-left:auto}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;margin-bottom:14px;overflow-x:auto}
+.seg button{flex:1;border:none;background:none;padding:8px 12px;border-radius:9px;font-weight:800;font-size:13.5px;color:var(--muted);white-space:nowrap}
+.seg button.on{background:var(--surface);color:var(--teal);box-shadow:var(--shadow)}
+
+/* Children manager */
+.crow{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:10px;box-shadow:var(--shadow)}
+.crow input{flex:1;border:none;background:none;font-family:inherit;font-size:16px;font-weight:800;color:var(--ink);min-width:0}
+.crow input:focus{outline:none}
+.mini{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--muted);flex:0 0 auto}
+.mini svg{width:17px;height:17px}
+.mini.del{color:var(--danger)}
+.swatches{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 2px}
+.swatch{width:30px;height:30px;border-radius:9px;border:2px solid transparent}
+.swatch.sel{border-color:var(--ink)}
+
+/* Toast + banner */
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-weight:800;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:90%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.banner{background:var(--teal-soft);border:1px solid color-mix(in srgb,var(--teal) 30%,var(--line));border-radius:14px;padding:12px 14px;font-size:13.5px;font-weight:600;color:var(--teal-d);margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
+.banner svg{width:18px;height:18px;flex:0 0 auto;margin-top:1px}
+.banner b{font-weight:800}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(20,17,14,.5);z-index:50;display:none;align-items:flex-end;justify-content:center;padding:0}
+.modal-bg.show{display:flex}
+.modal{background:var(--surface);width:100%;max-width:540px;border-radius:22px 22px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px rgba(0,0,0,.2)}
+.modal h3{margin:0 0 4px;font-size:19px}
+.modal p{margin:0 0 16px;color:var(--muted);font-size:14px;font-weight:600}
+.count{font-size:12px;color:var(--muted);font-weight:800;margin-left:auto}
+
+.reviewbar{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:12px;box-shadow:var(--shadow);font-weight:800;font-size:14px}
+.reviewbar .prog{margin-left:auto;color:var(--muted)}
+.togglerow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tg{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:7px;color:var(--muted)}
+.tg .tdot{width:12px;height:12px;border-radius:4px;background:var(--line)}
+.tg.on{color:var(--ink)}
+.footer-note{text-align:center;color:var(--muted);font-size:12px;font-weight:600;margin:22px 4px 0;line-height:1.5}
+a.link{color:var(--teal);font-weight:800;text-decoration:none}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,600;0,700;0,800;1,700&display=swap">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="top-in">
+      <button class="back" id="backBtn" hidden onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Retour</button>
+      <div class="brand" id="brand">
+        <span class="bear" id="brandBear"></span>
+        <div class="t"><b>Chez Nounou</b><span id="brandSub"></span></div>
+      </div>
+      <div class="spacer"></div>
+      <button class="icon-btn" id="histBtn" title="Historique" onclick="showHistory()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l3 2"/></svg></button>
+      <button class="icon-btn" id="kidsBtn" title="Enfants" onclick="showChildren()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 20a4.5 4.5 0 0 1 6-4"/></svg></button>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section class="view active" id="view-home">
+      <div class="page-h">
+        <div><h1>Aujourd'hui</h1><div class="sub" id="todayLabel"></div></div>
+        <button class="btn btn-primary btn-sm" style="width:auto" onclick="startEndOfDay()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Fin de journée</button>
+      </div>
+      <div id="homeBody"></div>
+      <div class="footer-note" id="homeFoot"></div>
+    </section>
+
+    <!-- EDITOR -->
+    <section class="view" id="view-edit">
+      <div class="page-h">
+        <div><h1 id="editName">Prénom</h1><div class="sub" id="editDate"></div></div>
+        <span class="pill" id="editFilled"></span>
+      </div>
+      <div class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10a7 7 0 0 1-14 0"/><path d="M12 17v4"/></svg>Astuce : pour dicter, touche la zone de texte puis le micro 🎤 de ton clavier iPhone.</div>
+      <div id="editSecs"></div>
+    </section>
+
+    <!-- PREVIEW / REVIEW -->
+    <section class="view" id="view-preview">
+      <div id="reviewBarWrap"></div>
+      <div class="page-h" style="margin-bottom:8px">
+        <div><h1>Vérification</h1><div class="sub">Relis avant d'envoyer aux parents</div></div>
+      </div>
+      <div class="togglerow" id="prevToggles"></div>
+      <div class="sheet-wrap"><div class="sheet-scale" id="sheetScale"></div></div>
+    </section>
+
+    <!-- CHILDREN -->
+    <section class="view" id="view-children">
+      <div class="page-h"><div><h1>Les enfants</h1><div class="sub">Gère les prénoms et couleurs</div></div></div>
+      <div id="childList"></div>
+      <button class="btn btn-ghost" onclick="addChild()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Ajouter un enfant</button>
+      <div class="footer-note">Les données restent sur cet iPhone. Pense à faire un export de sauvegarde de temps en temps (bouton dans l'Historique).</div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="view" id="view-history">
+      <div class="page-h"><div><h1>Historique</h1><div class="sub">Les fiches des 12 derniers mois</div></div></div>
+      <div class="seg" id="histSeg"></div>
+      <div id="histBody"></div>
+      <button class="btn btn-ghost" style="margin-top:10px" onclick="exportBackup()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Exporter une sauvegarde (archive)</button>
+    </section>
+  </main>
+
+  <!-- Sticky actions (editor & preview) -->
+  <div class="sticky-actions" id="stickyEdit" hidden>
+    <div class="in">
+      <button class="btn btn-ghost" style="flex:0 0 auto;width:auto;padding-left:16px;padding-right:16px" onclick="goHome()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M9 21V12h6v9"/></svg></button>
+      <button class="btn btn-primary" onclick="openPreview()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Vérifier & envoyer</button>
+    </div>
+  </div>
+  <div class="sticky-actions" id="stickyPrev" hidden>
+    <div class="in">
+      <button class="btn btn-ghost" style="flex:0 0 auto;width:auto;padding:14px 16px" onclick="saveOnly()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Garder</button>
+      <button class="btn btn-wa" onclick="sendFiche()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.9-4.44 9.9-9.9S17.5 2 12.04 2zm5.8 14.02c-.24.68-1.4 1.3-1.94 1.35-.5.05-1.13.07-1.82-.11-.42-.13-.96-.31-1.65-.61-2.9-1.25-4.79-4.17-4.94-4.36-.14-.19-1.18-1.57-1.18-3s.75-2.13 1.02-2.42c.27-.29.58-.36.78-.36l.56.01c.18.01.42-.07.66.5.24.58.82 2.01.89 2.16.07.14.12.31.02.5-.09.19-.14.31-.28.48-.14.17-.29.37-.42.5-.14.14-.28.29-.12.57.16.29.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.69-.8.87-1.08.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.28.14.46.21.53.32.07.12.07.68-.17 1.36z"/></svg>Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalCard"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+"use strict";
+/* ---------- Storage ---------- */
+const LS = {
+  get(k,d){ try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d} },
+  set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false} }
+};
+const K_CHILD='nounou.children.v1', K_ENTRY='nounou.entries.v1';
+
+/* ---------- Sections config ---------- */
+const COLORS = {repas:'#EFA636',sommeil:'#4A97E0',bobo:'#E77FAE',changes:'#E0A94E',ramener:'#4A443E',remarques:'#6FBE4E'};
+const AVCOLORS = ['#EFA636','#4A97E0','#E77FAE','#6FBE4E','#47978A','#B57BD1','#E0A94E','#EA7E5D'];
+const ICONS = {
+  repas:`<svg viewBox="0 0 40 40" fill="none"><g stroke="#EFA636" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="20" r="10.5" fill="#FBEBCF"/><circle cx="20" cy="20" r="6.2"/></g><g stroke="#EFA636" stroke-width="3" stroke-linecap="round"><path d="M5 8v9"/><path d="M8.4 8v9"/><path d="M6.7 17v14"/><path d="M34 8c-2 0-3.4 2-3.4 5.5S32 19 34 19"/><path d="M34 19v12"/></g></svg>`,
+  sommeil:`<svg viewBox="0 0 40 40" fill="none"><path d="M27.5 24.5A11 11 0 1 1 17 8.2a8.6 8.6 0 0 0 10.5 16.3z" fill="#4A97E0"/></svg>`,
+  bobo:`<svg viewBox="0 0 40 40" fill="none"><g transform="rotate(-35 20 20)"><rect x="7" y="14.5" width="26" height="11" rx="5.5" fill="#F6C6DC" stroke="#E77FAE" stroke-width="2.4"/><rect x="15.5" y="15" width="9" height="10" rx="3" fill="#fff"/><g fill="#E77FAE"><circle cx="18" cy="20" r="1"/><circle cx="22" cy="20" r="1"/><circle cx="20" cy="17.6" r="1"/><circle cx="20" cy="22.4" r="1"/></g></g></svg>`,
+  changes:`<svg viewBox="0 0 40 40" fill="none"><path d="M7 11h26v6c0 9-6.5 15-13 15S7 26 7 17z" fill="#F4D19A" stroke="#E0A94E" stroke-width="2.6" stroke-linejoin="round"/><path d="M7 15h26" stroke="#E0A94E" stroke-width="2.4"/></svg>`,
+  ramener:`<svg viewBox="0 0 40 40" fill="none"><path d="M11 15h18l1.6 16H9.4z" fill="#D9D3CB" stroke="#4A443E" stroke-width="2.6" stroke-linejoin="round"/><path d="M15 16v-3a5 5 0 0 1 10 0v3" stroke="#4A443E" stroke-width="2.6" stroke-linecap="round"/></svg>`,
+  remarques:`<svg viewBox="0 0 40 40" fill="none"><path d="M8 9h24a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H18l-7 6v-6H8a3 3 0 0 1-3-3V12a3 3 0 0 1 3-3z" fill="#D6F0C6" stroke="#6FBE4E" stroke-width="2.6" stroke-linejoin="round"/><path d="M12 16h16M12 21h10" stroke="#6FBE4E" stroke-width="2.6" stroke-linecap="round"/></svg>`
+};
+const MINI = {}; for(const k in ICONS){ MINI[k]=ICONS[k].replace('viewBox="0 0 40 40"','viewBox="0 0 40 40"'); }
+const BEAR = (c='#F4A93A')=>`<svg viewBox="0 0 40 40" fill="none"><circle cx="9.5" cy="10" r="4.6" fill="${c}"/><circle cx="30.5" cy="10" r="4.6" fill="${c}"/><circle cx="20" cy="21" r="13" fill="${c}"/><circle cx="20" cy="24" r="6.2" fill="#FCE3BE"/><circle cx="15.4" cy="18.6" r="1.9" fill="#4a3320"/><circle cx="24.6" cy="18.6" r="1.9" fill="#4a3320"/><ellipse cx="20" cy="22.6" rx="2.2" ry="1.7" fill="#7a5230"/></svg>`;
+
+const SECTIONS = [
+  {key:'repas', label:'Repas', full:false, ph:'Ce qu\'il/elle a mangé, l\'appétit, le biberon…', chips:['A bien mangé 👍','A goûté à tout','Petit appétit','N\'a pas voulu manger','Biberon pris en entier','A repris du rab !']},
+  {key:'sommeil', label:'Sommeil', full:false, ph:'Heures de sieste, qualité du sommeil…', chips:['Sieste 13h–15h','A bien dormi','Sieste courte','Endormissement difficile','Pas de sieste']},
+  {key:'bobo', label:'Bobo & Santé', full:false, ph:'Petits bobos, température, humeur, santé…', chips:['RAS 👌','Petit bobo','Un peu grognon','Nez qui coule','A pleuré au réveil','En pleine forme']},
+  {key:'changes', label:'Changes', full:false, ph:'Changes, selles, pot…', chips:['Changes réguliers','Selles OK','Rougeurs, crème appliquée','Pot : réussi 🎉']},
+  {key:'ramener', label:'À ramener', full:true, ph:'Ce que les parents doivent rapporter…', chips:['Penser aux couches','Vêtements de change','Doudou lavé à rapporter','Plus de lait','Rien pour aujourd\'hui']},
+  {key:'remarques', label:'Remarques', full:true, ph:'Le mot de la journée, activités, anecdotes…', chips:['Belle journée 🌟','A bien joué avec les copains','Activité peinture 🎨','Câlins +++','Un peu fatigué ce soir','Grande promenade']}
+];
+const SECMAP = {}; SECTIONS.forEach(s=>SECMAP[s.key]=s);
+
+/* ---------- State ---------- */
+let CHILDREN = LS.get(K_CHILD, null);
+let ENTRIES = LS.get(K_ENTRY, {});
+let usingDemo = false;
+if(!CHILDREN || CHILDREN.length===0){ usingDemo=true; }
+
+const DEMO_CHILDREN=[{id:'demo1',name:'Lina',color:'#E77FAE'},{id:'demo2',name:'Noah',color:'#4A97E0'},{id:'demo3',name:'Jade',color:'#6FBE4E'}];
+const DEMO_ENTRIES={
+ ['demo1|'+todayKey()]:{sections:{repas:{on:true,text:'A très bien mangé, a repris du rab de purée de carottes 🥕'},sommeil:{on:true,text:'Belle sieste de 13h à 15h15.'},bobo:{on:true,text:'RAS 👌 en pleine forme aujourd\'hui.'},changes:{on:true,text:'Changes réguliers, tout va bien.'},ramener:{on:true,text:'Penser à rapporter des couches 😊'},remarques:{on:true,text:'Journée pleine de câlins et de peinture 🎨'}}},
+ ['demo2|'+todayKey()]:{sections:{repas:{on:true,text:'Petit appétit ce midi.'},sommeil:{on:true,text:'A eu du mal à s\'endormir, sieste courte.'},bobo:{on:true,text:'Nez qui coule un peu.'},changes:{on:true,text:''},ramener:{on:false,text:''},remarques:{on:true,text:'A adoré jouer dehors ce matin ☀️'}}}
+};
+function childList(){ return usingDemo ? DEMO_CHILDREN : CHILDREN; }
+function entryStore(){ return usingDemo ? DEMO_ENTRIES : ENTRIES; }
+
+/* ---------- Dates ---------- */
+function todayKey(d){ d=d||new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+const JOURS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+const MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+function longDate(key){ const [y,m,dd]=key.split('-').map(Number); const d=new Date(y,m-1,dd); return JOURS[d.getDay()]+' '+dd+' '+MOIS[m-1]+' '+y; }
+function shortDate(key){ const [y,m,dd]=key.split('-').map(Number); const d=new Date(y,m-1,dd); return JOURS[d.getDay()].slice(0,3)+'. '+dd+' '+MOIS[m-1].slice(0,4)+'.'; }
+let TODAY = todayKey();
+
+/* ---------- Entry helpers ---------- */
+function blankEntry(){ const s={}; SECTIONS.forEach(x=>s[x.key]={on:true,text:''}); return {sections:s}; }
+function getEntry(childId, dateKey, create){
+  const store=entryStore(); const k=childId+'|'+dateKey;
+  if(!store[k]){ if(!create) return null; store[k]=blankEntry(); }
+  // ensure all sections exist
+  SECTIONS.forEach(x=>{ if(!store[k].sections[x.key]) store[k].sections[x.key]={on:true,text:''}; });
+  return store[k];
+}
+function entryHasContent(e){ if(!e) return false; return SECTIONS.some(s=>e.sections[s.key]&&e.sections[s.key].on&&e.sections[s.key].text.trim()); }
+function filledCount(e){ if(!e) return 0; return SECTIONS.filter(s=>e.sections[s.key]&&e.sections[s.key].on&&e.sections[s.key].text.trim()).length; }
+function persist(){ if(usingDemo) return; LS.set(K_ENTRY, ENTRIES); }
+function persistChildren(){ if(usingDemo) return; LS.set(K_CHILD, CHILDREN); }
+
+/* ---------- Navigation ---------- */
+let CURRENT=null; // {childId,dateKey}
+let VIEW='home';
+let reviewQueue=null, reviewIdx=0;
+function setView(v){
+  VIEW=v;
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.getElementById('stickyEdit').hidden = v!=='edit';
+  document.getElementById('stickyPrev').hidden = v!=='preview';
+  const back=document.getElementById('backBtn'), brand=document.getElementById('brand');
+  const showBack = v!=='home';
+  back.hidden=!showBack; brand.style.display=showBack?'none':'flex';
+  document.getElementById('histBtn').style.display = (v==='home')?'grid':'none';
+  document.getElementById('kidsBtn').style.display = (v==='home')?'grid':'none';
+  window.scrollTo(0,0);
+}
+function goHome(){ CURRENT=null; reviewQueue=null; renderHome(); setView('home'); }
+function goBack(){
+  if(VIEW==='edit') goHome();
+  else if(VIEW==='preview'){ if(reviewQueue){ renderEditor(); setView('edit'); } else { renderEditor(); setView('edit'); } }
+  else if(VIEW==='children'||VIEW==='history') goHome();
+  else goHome();
+}
+
+/* ---------- HOME ---------- */
+function renderHome(){
+  usingDemo = !CHILDREN || CHILDREN.length===0;
+  document.getElementById('todayLabel').textContent = capitalize(longDate(TODAY));
+  document.getElementById('brandSub').textContent = capitalize(longDate(TODAY));
+  document.getElementById('brandBear').innerHTML = BEAR();
+  const body=document.getElementById('homeBody');
+  const kids=childList();
+  const foot=document.getElementById('homeFoot');
+  if(usingDemo){
+    body.innerHTML = `<div class="banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><div>Voici un <b>exemple</b> pour montrer à quoi ça ressemble. Touche <b>Ajouter un enfant</b> pour mettre les vrais prénoms — l'exemple disparaîtra.</div></div>`;
+  } else { body.innerHTML=''; }
+  const grid=document.createElement('div'); grid.className='grid';
+  kids.forEach(c=>grid.appendChild(childCard(c)));
+  // add-child card
+  const add=document.createElement('button'); add.className='addcard'; add.onclick=addChild;
+  add.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Ajouter un enfant`;
+  grid.appendChild(add);
+  body.appendChild(grid);
+  foot.innerHTML = usingDemo ? '' : 'Touche un enfant pour remplir sa journée. En fin de journée, « Fin de journée » te fait relire et envoyer chaque fiche.';
+}
+function childCard(c){
+  const e=getEntry(c.id,TODAY,false);
+  const n=filledCount(e); const total=SECTIONS.length;
+  const btn=document.createElement('button'); btn.className='child'; btn.onclick=()=>openChild(c.id);
+  let dots='';
+  SECTIONS.forEach(s=>{ const on=e&&e.sections[s.key]&&e.sections[s.key].on&&e.sections[s.key].text.trim();
+    dots+=`<span class="dot" style="background:${on?COLORS[s.key]:'var(--surface-2)'}">${on?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>':''}</span>`; });
+  btn.innerHTML=`${usingDemo?'<span class="badge-demo">exemple</span>':''}
+    <div class="avatar" style="background:${c.color}">${initials(c.name)}</div>
+    <div class="nm">${esc(c.name)}</div>
+    <div class="meta">${n?n+' / '+total+' rempli'+(n>1?'s':''):'À remplir'}</div>
+    <div class="status">${dots}</div>`;
+  return btn;
+}
+
+/* ---------- EDITOR ---------- */
+function openChild(id){
+  if(usingDemo){ toast('C\'est un exemple — ajoute un vrai enfant pour commencer ✍️'); return; }
+  CURRENT={childId:id,dateKey:TODAY};
+  getEntry(id,TODAY,true);
+  renderEditor(); setView('edit');
+}
+function currentChild(){ return childList().find(c=>c.id===CURRENT.childId); }
+function renderEditor(){
+  const c=currentChild(); const e=getEntry(CURRENT.childId,CURRENT.dateKey,true);
+  document.getElementById('editName').textContent=c.name;
+  document.getElementById('editDate').textContent=capitalize(longDate(CURRENT.dateKey));
+  updateFilledPill();
+  const wrap=document.getElementById('editSecs'); wrap.innerHTML='';
+  SECTIONS.forEach(s=>{
+    const sec=e.sections[s.key];
+    const div=document.createElement('div'); div.className='sec'+(sec.on?'':' off');
+    div.innerHTML=`
+      <div class="sec-h">
+        <span class="sec-ic" style="background:${hex2rgba(COLORS[s.key],.16)}">${ICONS[s.key]}</span>
+        <span class="lbl" style="color:${COLORS[s.key]}">${s.label}</span>
+        <button class="sw ${sec.on?'on':''}" aria-label="Activer ${s.label}"></button>
+      </div>
+      <div class="sec-body">
+        <textarea placeholder="${esc(s.ph)}">${esc(sec.text)}</textarea>
+        <div class="chips">${s.chips.map(ch=>`<button class="chip" type="button">${esc(ch)}</button>`).join('')}</div>
+      </div>`;
+    const sw=div.querySelector('.sw'); const ta=div.querySelector('textarea');
+    sw.onclick=()=>{ sec.on=!sec.on; div.classList.toggle('off',!sec.on); sw.classList.toggle('on',sec.on); persist(); updateFilledPill(); };
+    ta.addEventListener('input',()=>{ sec.text=ta.value; persist(); updateFilledPill(); });
+    div.querySelectorAll('.chip').forEach((btn,i)=>btn.onclick=()=>{
+      const t=s.chips[i]; ta.value = ta.value.trim() ? ta.value.replace(/\s*$/,'')+'\n'+t : t; sec.text=ta.value; persist(); updateFilledPill(); ta.focus();
+    });
+    wrap.appendChild(div);
+  });
+}
+function updateFilledPill(){ const e=getEntry(CURRENT.childId,CURRENT.dateKey,false); document.getElementById('editFilled').textContent=filledCount(e)+' / '+SECTIONS.length; }
+
+/* ---------- PREVIEW / REVIEW ---------- */
+function openPreview(){ reviewQueue=null; buildPreview(CURRENT.childId,CURRENT.dateKey); setView('preview'); }
+function startEndOfDay(){
+  if(usingDemo){ toast('Ajoute d\'abord tes enfants 🙂'); return; }
+  const kids=childList().filter(c=>{ const e=getEntry(c.id,TODAY,false); return entryHasContent(e); });
+  if(kids.length===0){ toast('Rien à envoyer pour l\'instant.'); return; }
+  reviewQueue=kids.map(c=>c.id); reviewIdx=0;
+  CURRENT={childId:reviewQueue[0],dateKey:TODAY};
+  buildPreview(CURRENT.childId,TODAY); setView('preview');
+}
+let PREV_INCLUDE={};
+function buildPreview(childId,dateKey){
+  CURRENT={childId,dateKey};
+  const e=getEntry(childId,dateKey,true);
+  PREV_INCLUDE={}; SECTIONS.forEach(s=>{ PREV_INCLUDE[s.key]= e.sections[s.key].on && !!e.sections[s.key].text.trim(); });
+  // review bar
+  const rb=document.getElementById('reviewBarWrap');
+  if(reviewQueue){
+    rb.innerHTML=`<div class="reviewbar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Fin de journée <span class="prog">${reviewIdx+1} / ${reviewQueue.length}</span></div>`;
+  } else rb.innerHTML='';
+  // toggles
+  const tw=document.getElementById('prevToggles'); tw.innerHTML='';
+  SECTIONS.forEach(s=>{
+    const has=e.sections[s.key].text.trim();
+    const tg=document.createElement('button'); tg.className='tg'+(PREV_INCLUDE[s.key]?' on':'');
+    tg.innerHTML=`<span class="tdot" style="background:${PREV_INCLUDE[s.key]?COLORS[s.key]:'var(--line)'}"></span>${s.label}`;
+    tg.onclick=()=>{ PREV_INCLUDE[s.key]=!PREV_INCLUDE[s.key]; tg.classList.toggle('on',PREV_INCLUDE[s.key]); tg.querySelector('.tdot').style.background=PREV_INCLUDE[s.key]?COLORS[s.key]:'var(--line)'; renderSheet(); };
+    if(!has){ tg.style.opacity=.5; }
+    tw.appendChild(tg);
+  });
+  renderSheet();
+}
+function sheetHTML(childId,dateKey,include){
+  const c=childList().find(x=>x.id===childId); const e=getEntry(childId,dateKey,true);
+  const secs=SECTIONS.filter(s=>include[s.key]);
+  const blocks = secs.length? secs.map(s=>`
+    <div class="s-sec${s.full?' full':''}">
+      <div class="s-h"><span class="si">${ICONS[s.key]}</span><span class="sl" style="color:${COLORS[s.key]}">${s.label}</span></div>
+      <div class="s-box" style="background:${hex2rgba(COLORS[s.key],.16)}">${esc(e.sections[s.key].text).replace(/\n/g,'<br>')||'—'}</div>
+    </div>`).join('') : `<div class="s-sec full"><div class="s-box" style="background:#f3efe8">Aucune rubrique sélectionnée.</div></div>`;
+  return `<div class="sheet" id="theSheet">
+    <div class="s-top">
+      <div><h1 class="s-title">Ma journée<br>chez Nounou</h1><div class="s-sub">${esc(c?c.name:'')} · ${longDate(dateKey)}</div></div>
+      <span class="s-bear">${BEAR()}</span>
+    </div>
+    <div class="s-grid">${blocks}</div>
+    <div class="s-foot">Fiche transmise avec ❤️ par Nounou</div>
+  </div>`;
+}
+function renderSheet(){
+  const host=document.getElementById('sheetScale');
+  host.innerHTML=sheetHTML(CURRENT.childId,CURRENT.dateKey,PREV_INCLUDE);
+  // scale 794px sheet to container width
+  const wrap=host.parentElement; const avail=wrap.clientWidth-28;
+  const scale=Math.min(1, avail/794);
+  host.style.transform='scale('+scale+')';
+  const sh=host.querySelector('.sheet');
+  wrap.style.height=(sh.offsetHeight*scale)+'px';
+}
+window.addEventListener('resize',()=>{ if(VIEW==='preview'&&CURRENT) renderSheet(); });
+
+/* ---------- Save / Send ---------- */
+function markSent(childId,dateKey){ const e=getEntry(childId,dateKey,true); e.sentAt=Date.now(); e.include=Object.assign({},PREV_INCLUDE); persist(); }
+function saveOnly(){
+  markSent(CURRENT.childId,CURRENT.dateKey);
+  nextOrHome('Fiche gardée dans l\'historique ✅');
+}
+function nextOrHome(msg){
+  if(reviewQueue && reviewIdx < reviewQueue.length-1){
+    reviewIdx++; CURRENT={childId:reviewQueue[reviewIdx],dateKey:TODAY};
+    buildPreview(CURRENT.childId,TODAY); setView('preview'); toast(msg);
+  } else { reviewQueue=null; toast(msg); goHome(); }
+}
+async function sendFiche(){
+  const c=currentChild(); const dateKey=CURRENT.dateKey;
+  toast('Préparation du PDF…');
+  let blob;
+  try{ blob = await makePdfBlob(CURRENT.childId,dateKey,PREV_INCLUDE); }
+  catch(err){ console.error(err); toast('Souci lors de la création du PDF.'); return; }
+  const fname = 'Fiche '+(c?c.name:'enfant')+' '+dateKey+'.pdf';
+  const file = new File([blob],fname,{type:'application/pdf'});
+  markSent(CURRENT.childId,dateKey);
+  const shareData={files:[file],title:fname,text:'La journée de '+(c?c.name:'')+' 🧸'};
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share(shareData);
+      nextOrHome('Envoyée ✅'); return;
+    }catch(err){ if(err && err.name==='AbortError'){ toast('Envoi annulé'); return;} }
+  }
+  // fallback: open the PDF so iOS shows its own share button
+  let opened=false;
+  try{ const u=URL.createObjectURL(blob); const w=window.open(u,'_blank'); opened=!!w; setTimeout(()=>URL.revokeObjectURL(u),8000); }catch(e){}
+  if(!opened) downloadBlob(blob,fname);
+  toast(opened?'Touche Partager sur le PDF pour WhatsApp 📎':'Ouvre l\'app depuis l\'écran d\'accueil pour l\'envoi direct');
+  setTimeout(()=>nextOrHome('Fiche gardée ✅'),500);
+}
+async function makePdfBlob(childId,dateKey,include){
+  // offscreen full-size sheet
+  const holder=document.createElement('div');
+  holder.style.cssText='position:fixed;left:-10000px;top:0;width:794px;background:#fff;';
+  holder.innerHTML=sheetHTML(childId,dateKey,include);
+  document.body.appendChild(holder);
+  const sheet=holder.querySelector('.sheet');
+  await document.fonts.ready.catch(()=>{});
+  const canvas=await html2canvas(sheet,{scale:2,backgroundColor:'#ffffff',useCORS:true,windowWidth:794});
+  document.body.removeChild(holder);
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF('p','pt','a4');
+  const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+  const imgW=pw, imgH=canvas.height*imgW/canvas.width;
+  const img=canvas.toDataURL('image/jpeg',0.94);
+  let hLeft=imgH, pos=0;
+  pdf.addImage(img,'JPEG',0,0,imgW,imgH); hLeft-=ph;
+  while(hLeft>0){ pos=hLeft-imgH; pdf.addPage(); pdf.addImage(img,'JPEG',0,pos,imgW,imgH); hLeft-=ph; }
+  return pdf.output('blob');
+}
+function downloadBlob(blob,name){ const u=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),3000); }
+
+/* ---------- CHILDREN manager ---------- */
+function showChildren(){ renderChildren(); setView('children'); }
+function renderChildren(){
+  const list=document.getElementById('childList'); list.innerHTML='';
+  if(usingDemo) CHILDREN=[];
+  (CHILDREN||[]).forEach((c,idx)=>{
+    const row=document.createElement('div'); row.className='crow';
+    row.innerHTML=`<div class="avatar" style="background:${c.color};width:38px;height:38px;border-radius:11px;font-size:16px">${initials(c.name)}</div>
+      <input value="${esc(c.name)}" maxlength="24" aria-label="Prénom"/>
+      <button class="mini" title="Couleur">🎨</button>
+      <button class="mini del" title="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14"/></svg></button>`;
+    const inp=row.querySelector('input');
+    inp.addEventListener('input',()=>{ c.name=inp.value; persistChildren(); });
+    inp.addEventListener('blur',()=>{ if(!c.name.trim()){ c.name='Enfant'; inp.value=c.name; persistChildren(); } row.querySelector('.avatar').textContent=initials(c.name); });
+    row.querySelector('.mini:not(.del)').onclick=()=>colorPicker(c,row);
+    row.querySelector('.del').onclick=()=>confirmDeleteChild(idx);
+    list.appendChild(row);
+  });
+  if((CHILDREN||[]).length===0){ list.innerHTML='<div class="empty" style="padding:20px 8px"><div>Aucun enfant pour l\'instant.</div></div>'; }
+}
+function colorPicker(c,row){
+  openModal(`<h3>Couleur de ${esc(c.name)}</h3><p>Choisis une couleur pour le repérer vite.</p>
+    <div class="swatches">${AVCOLORS.map(col=>`<button class="swatch ${col===c.color?'sel':''}" style="background:${col}" data-c="${col}"></button>`).join('')}</div>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="closeModal()">OK</button>`);
+  document.querySelectorAll('#modalCard .swatch').forEach(sw=>sw.onclick=()=>{
+    c.color=sw.dataset.c; persistChildren();
+    document.querySelectorAll('#modalCard .swatch').forEach(x=>x.classList.remove('sel')); sw.classList.add('sel');
+    row.querySelector('.avatar').style.background=c.color;
+  });
+}
+function addChild(){
+  if(usingDemo){ usingDemo=false; CHILDREN=[]; }
+  openModal(`<h3>Nouvel enfant</h3><p>Ajoute le prénom de l'enfant que tu gardes.</p>
+    <div class="crow" style="margin-bottom:14px"><input id="newName" placeholder="Prénom" maxlength="24" autofocus></div>
+    <button class="btn btn-primary" onclick="doAddChild()">Ajouter</button>`);
+  setTimeout(()=>{ const n=document.getElementById('newName'); if(n){ n.focus(); n.addEventListener('keydown',e=>{if(e.key==='Enter')doAddChild();}); } },60);
+}
+function doAddChild(){
+  const n=document.getElementById('newName').value.trim(); if(!n){ toast('Écris un prénom 🙂'); return; }
+  if(!CHILDREN) CHILDREN=[];
+  const color=AVCOLORS[CHILDREN.length % AVCOLORS.length];
+  CHILDREN.push({id:'c'+Date.now()+Math.floor(Math.random()*999),name:n,color});
+  usingDemo=false; persistChildren(); closeModal();
+  if(VIEW==='children') renderChildren(); else { renderHome(); }
+  toast(n+' ajouté(e) ✅');
+}
+function confirmDeleteChild(idx){
+  const c=CHILDREN[idx];
+  openModal(`<h3>Supprimer ${esc(c.name)} ?</h3><p>Ses fiches passées seront aussi effacées. Cette action est définitive.</p>
+    <div class="btn-row"><button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+    <button class="btn" style="background:var(--danger);color:#fff" onclick="doDeleteChild(${idx})">Supprimer</button></div>`);
+}
+function doDeleteChild(idx){
+  const c=CHILDREN[idx]; CHILDREN.splice(idx,1);
+  Object.keys(ENTRIES).forEach(k=>{ if(k.startsWith(c.id+'|')) delete ENTRIES[k]; });
+  persistChildren(); persist(); closeModal(); renderChildren();
+  if((CHILDREN||[]).length===0) usingDemo=true;
+  toast('Supprimé');
+}
+
+/* ---------- HISTORY ---------- */
+let histChild='all';
+function showHistory(){ pruneOld(); histChild='all'; renderHistory(); setView('history'); }
+function renderHistory(){
+  const seg=document.getElementById('histSeg'); const kids=childList();
+  seg.innerHTML=`<button class="${histChild==='all'?'on':''}" onclick="setHistChild('all')">Tous</button>`+
+    kids.map(c=>`<button class="${histChild===c.id?'on':''}" onclick="setHistChild('${c.id}')">${esc(c.name)}</button>`).join('');
+  const body=document.getElementById('histBody'); body.innerHTML='';
+  const store=entryStore();
+  let rows=[];
+  Object.keys(store).forEach(k=>{
+    const [cid,dk]=k.split('|'); if(histChild!=='all'&&cid!==histChild) return;
+    const e=store[k]; if(!entryHasContent(e)&&!e.sentAt) return;
+    rows.push({cid,dk,e});
+  });
+  rows.sort((a,b)=> a.dk<b.dk?1:a.dk>b.dk?-1:0);
+  if(rows.length===0){ body.innerHTML='<div class="empty"><div class="bear">'+BEAR()+'</div><h2>Rien encore</h2><div>Les fiches que tu remplis apparaîtront ici, gardées pendant 1 an.</div></div>'; return; }
+  rows.forEach(r=>{
+    const c=kids.find(x=>x.id===r.cid)||{name:'?',color:'#ccc'};
+    const btn=document.createElement('button'); btn.className='hist-day';
+    btn.innerHTML=`<div class="avatar" style="background:${c.color};width:38px;height:38px;border-radius:11px;font-size:15px">${initials(c.name)}</div>
+      <div><div class="d">${capitalize(longDate(r.dk))}</div><div class="p">${esc(c.name)} · ${filledCount(r.e)||countAny(r.e)} rubrique(s)${r.e.sentAt?' · envoyée':''}</div></div>
+      <svg class="chevrers" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>`;
+    btn.onclick=()=>openHistEntry(r.cid,r.dk);
+    body.appendChild(btn);
+  });
+}
+function countAny(e){ return SECTIONS.filter(s=>e.sections[s.key]&&e.sections[s.key].text.trim()).length; }
+function setHistChild(id){ histChild=id; renderHistory(); }
+function openHistEntry(cid,dk){
+  CURRENT={childId:cid,dateKey:dk}; reviewQueue=null;
+  const e=getEntry(cid,dk,true);
+  PREV_INCLUDE={}; SECTIONS.forEach(s=>{ PREV_INCLUDE[s.key]= (e.include?e.include[s.key]:(e.sections[s.key].on)) && !!e.sections[s.key].text.trim(); });
+  document.getElementById('reviewBarWrap').innerHTML='';
+  const tw=document.getElementById('prevToggles'); tw.innerHTML='';
+  SECTIONS.forEach(s=>{ const has=e.sections[s.key].text.trim(); const tg=document.createElement('button'); tg.className='tg'+(PREV_INCLUDE[s.key]?' on':'');
+    tg.innerHTML=`<span class="tdot" style="background:${PREV_INCLUDE[s.key]?COLORS[s.key]:'var(--line)'}"></span>${s.label}`;
+    tg.onclick=()=>{ PREV_INCLUDE[s.key]=!PREV_INCLUDE[s.key]; tg.classList.toggle('on',PREV_INCLUDE[s.key]); tg.querySelector('.tdot').style.background=PREV_INCLUDE[s.key]?COLORS[s.key]:'var(--line)'; renderSheet(); };
+    if(!has) tg.style.opacity=.5; tw.appendChild(tg);
+  });
+  renderSheet(); setView('preview');
+}
+function pruneOld(){
+  const cutoff=new Date(); cutoff.setFullYear(cutoff.getFullYear()-1);
+  const ck=todayKey(cutoff); let removed=0;
+  Object.keys(ENTRIES).forEach(k=>{ const dk=k.split('|')[1]; if(dk<ck){ delete ENTRIES[k]; removed++; } });
+  if(removed){ persist(); }
+}
+
+/* ---------- Export backup ---------- */
+function exportBackup(){
+  if(usingDemo){ toast('Ajoute des enfants d\'abord 🙂'); return; }
+  const data={app:'Chez Nounou',version:1,exportedAt:new Date().toISOString(),children:CHILDREN,entries:ENTRIES};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const name='Sauvegarde Chez Nounou '+todayKey()+'.json';
+  const file=new File([blob],name,{type:'application/json'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    navigator.share({files:[file],title:name}).then(()=>toast('Sauvegarde exportée ✅')).catch(()=>{});
+  } else { downloadBlob(blob,name); toast('Sauvegarde téléchargée ✅'); }
+}
+
+/* ---------- Modal / toast ---------- */
+function openModal(html){ document.getElementById('modalCard').innerHTML=html; document.getElementById('modalBg').classList.add('show'); }
+function closeModal(){ document.getElementById('modalBg').classList.remove('show'); }
+let toastT;
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2400); }
+
+/* ---------- Utils ---------- */
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function initials(n){ n=(n||'').trim(); if(!n) return '?'; const p=n.split(/\s+/); return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase(); }
+function capitalize(s){ return s? s.charAt(0).toUpperCase()+s.slice(1):s; }
+function hex2rgba(hex,a){ const h=hex.replace('#',''); const r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16); return `rgba(${r},${g},${b},${a})`; }
+
+/* ---------- Init ---------- */
+renderHome(); setView('home');
+</script>
+
+</body>
+</html>
