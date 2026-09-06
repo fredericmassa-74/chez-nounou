@@ -185,6 +185,44 @@ textarea:focus{outline:none;border-color:var(--teal);background:var(--surface)}
 .tg.on{color:var(--ink)}
 .footer-note{text-align:center;color:var(--muted);font-size:12px;font-weight:600;margin:22px 4px 0;line-height:1.5}
 a.link{color:var(--teal);font-weight:800;text-decoration:none}
+
+/* Profile editor + emergency card */
+.cardinfo{position:absolute;top:10px;right:10px;width:27px;height:27px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;color:var(--teal-d);font-family:"Fredoka",sans-serif;font-weight:700;font-size:15px;z-index:2;line-height:1}
+.rowbtn{border:1px solid var(--line);background:var(--surface);color:var(--teal-d);font-weight:800;border-radius:10px;padding:8px 11px;font-size:13px;flex:0 0 auto}
+.group{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 14px 4px;margin-bottom:12px}
+.group>h3{margin:0 0 12px;font-size:15px;display:flex;align-items:center;gap:8px}
+.group>h3 .gd{width:11px;height:11px;border-radius:4px;flex:0 0 auto}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;font-weight:800;color:var(--muted);margin:0 0 5px;text-transform:uppercase;letter-spacing:.3px}
+.field input{width:100%;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:11px;padding:11px 12px;font-family:inherit;font-size:15.5px}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--teal);background:var(--surface)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:400px){.two{grid-template-columns:1fr}}
+.contact-card{border:1px solid var(--line);border-radius:12px;padding:12px 12px 2px;margin-bottom:10px;background:var(--surface-2)}
+.contact-card .rm{float:right;color:var(--danger);background:none;border:none;font-weight:800;font-size:13px;padding:2px 0}
+.addline{border:1.5px dashed var(--line);background:none;color:var(--teal);border-radius:12px;padding:12px;width:100%;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
+.age-chip{font-size:12.5px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);padding:5px 10px;border-radius:999px;display:inline-block}
+.ecard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+.ecard-top{padding:16px;display:flex;gap:14px;align-items:center;color:#fff}
+.ecard-top .av{width:54px;height:54px;border-radius:16px;background:rgba(255,255,255,.28);display:grid;place-items:center;font-family:"Fredoka",sans-serif;font-weight:600;font-size:24px;flex:0 0 auto}
+.ecard-top .nm{font-family:"Fredoka",sans-serif;font-weight:600;font-size:23px;line-height:1.1}
+.ecard-top .bd{font-size:13px;font-weight:700;opacity:.96;margin-top:3px}
+.ecard-sec{padding:13px 16px;border-top:1px solid var(--line)}
+.ecard-sec h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+.prow{display:flex;align-items:center;gap:10px;padding:9px 0}
+.prow+.prow{border-top:1px dashed var(--line)}
+.prow .pnm{font-weight:800;font-size:15.5px}
+.prow .prole{font-size:12.5px;color:var(--muted);font-weight:700;margin-top:1px}
+.callbtns{margin-left:auto;display:flex;gap:8px;flex:0 0 auto}
+.callbtn{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;text-decoration:none;border:1px solid var(--line);background:var(--surface-2)}
+.callbtn svg{width:20px;height:20px;fill:none}
+.callbtn.tel{background:#E4F3EA;border-color:#bfe3cd}
+.callbtn.tel svg{stroke:#1f9e57}
+.callbtn.mail svg{stroke:var(--teal-d)}
+.pinfo{background:#FFF4E0;border:1px solid #F0D9A8;color:#7a5a12;border-radius:12px;padding:11px 13px;font-size:14.5px;font-weight:600;white-space:pre-wrap;line-height:1.45}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pinfo{background:#3a3320;border-color:#5a4d2a;color:#ecd9a6}}
+:root[data-theme="dark"] .pinfo{background:#3a3320;border-color:#5a4d2a;color:#ecd9a6}
+.empty-mini{color:var(--muted);font-size:14px;font-weight:600;padding:4px 0 12px}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -220,7 +258,10 @@ a.link{color:var(--teal);font-weight:800;text-decoration:none}
     <section class="view" id="view-edit">
       <div class="page-h">
         <div><h1 id="editName">Prénom</h1><div class="sub" id="editDate"></div></div>
-        <span class="pill" id="editFilled"></span>
+        <div style="display:flex;gap:8px;align-items:center;flex:0 0 auto">
+          <button class="icon-btn" title="Fiche de l'enfant" onclick="if(CURRENT)openCard(CURRENT.childId,'edit')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg></button>
+          <span class="pill" id="editFilled"></span>
+        </div>
       </div>
       <div class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10a7 7 0 0 1-14 0"/><path d="M12 17v4"/></svg>Astuce : pour dicter, touche la zone de texte puis le micro 🎤 de ton clavier iPhone.</div>
       <div id="editSecs"></div>
@@ -251,6 +292,11 @@ a.link{color:var(--teal);font-weight:800;text-decoration:none}
       <div id="histBody"></div>
       <button class="btn btn-ghost" style="margin-top:10px" onclick="exportBackup()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Exporter une sauvegarde (archive)</button>
     </section>
+
+    <!-- PROFILE (edit) -->
+    <section class="view" id="view-profile"><div id="profileBody"></div></section>
+    <!-- EMERGENCY CARD (read-only) -->
+    <section class="view" id="view-card"><div id="cardBody"></div></section>
   </main>
 
   <!-- Sticky actions (editor & preview) -->
@@ -316,7 +362,11 @@ let ENTRIES = LS.get(K_ENTRY, {});
 let usingDemo = false;
 if(!CHILDREN || CHILDREN.length===0){ usingDemo=true; }
 
-const DEMO_CHILDREN=[{id:'demo1',name:'Lina',color:'#E77FAE'},{id:'demo2',name:'Noah',color:'#4A97E0'},{id:'demo3',name:'Jade',color:'#6FBE4E'}];
+const DEMO_CHILDREN=[
+ {id:'demo1',name:'Lina',color:'#E77FAE',birthdate:'2023-05-14',mother:{name:'Camille Bernard',phone:'06 12 34 56 78',email:'camille.bernard@email.fr'},father:{name:'Thomas Bernard',phone:'06 98 76 54 32',email:''},contacts:[{name:'Mamie Jeanne',relation:'Grand-mère',phone:'06 44 55 66 77'}],notes:'Allergie aux arachides. Médecin : Dr Petit — 04 50 00 00 00.'},
+ {id:'demo2',name:'Noah',color:'#4A97E0',birthdate:'2024-02-02',mother:{name:'Sarah Léon',phone:'06 11 22 33 44',email:''},father:{name:'',phone:'',email:''},contacts:[],notes:''},
+ {id:'demo3',name:'Jade',color:'#6FBE4E',birthdate:'',mother:{name:'',phone:'',email:''},father:{name:'',phone:'',email:''},contacts:[],notes:''}
+];
 const DEMO_ENTRIES={
  ['demo1|'+todayKey()]:{sections:{repas:{on:true,text:'A très bien mangé, a repris du rab de purée de carottes 🥕'},sommeil:{on:true,text:'Belle sieste de 13h à 15h15.'},bobo:{on:true,text:'RAS 👌 en pleine forme aujourd\'hui.'},changes:{on:true,text:'Changes réguliers, tout va bien.'},ramener:{on:true,text:'Penser à rapporter des couches 😊'},remarques:{on:true,text:'Journée pleine de câlins et de peinture 🎨'}}},
  ['demo2|'+todayKey()]:{sections:{repas:{on:true,text:'Petit appétit ce midi.'},sommeil:{on:true,text:'A eu du mal à s\'endormir, sieste courte.'},bobo:{on:true,text:'Nez qui coule un peu.'},changes:{on:true,text:''},ramener:{on:false,text:''},remarques:{on:true,text:'A adoré jouer dehors ce matin ☀️'}}}
@@ -366,7 +416,9 @@ function setView(v){
 function goHome(){ CURRENT=null; reviewQueue=null; renderHome(); setView('home'); }
 function goBack(){
   if(VIEW==='edit') goHome();
-  else if(VIEW==='preview'){ if(reviewQueue){ renderEditor(); setView('edit'); } else { renderEditor(); setView('edit'); } }
+  else if(VIEW==='preview'){ renderEditor(); setView('edit'); }
+  else if(VIEW==='profile'){ if(PROF_CTX.from==='card') openCard(PROF_CTX.childId,'children'); else if(PROF_CTX.from==='children') showChildren(); else goHome(); }
+  else if(VIEW==='card'){ const f=CARD_CTX.from; if(f==='edit'){ CURRENT={childId:CARD_CTX.childId,dateKey:TODAY}; renderEditor(); setView('edit'); } else if(f==='profile') openProfile(CARD_CTX.childId,'children'); else if(f==='children') showChildren(); else goHome(); }
   else if(VIEW==='children'||VIEW==='history') goHome();
   else goHome();
 }
@@ -399,7 +451,7 @@ function childCard(c){
   let dots='';
   SECTIONS.forEach(s=>{ const on=e&&e.sections[s.key]&&e.sections[s.key].on&&e.sections[s.key].text.trim();
     dots+=`<span class="dot" style="background:${on?COLORS[s.key]:'var(--surface-2)'}">${on?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>':''}</span>`; });
-  btn.innerHTML=`${usingDemo?'<span class="badge-demo">exemple</span>':''}
+  btn.innerHTML=`${usingDemo?'<span class="badge-demo">exemple</span>':`<span class="cardinfo" role="button" title="Fiche" onclick="event.stopPropagation();openCard('${c.id}','home')">i</span>`}
     <div class="avatar" style="background:${c.color}">${initials(c.name)}</div>
     <div class="nm">${esc(c.name)}</div>
     <div class="meta">${n?n+' / '+total+' rempli'+(n>1?'s':''):'À remplir'}</div>
@@ -571,8 +623,10 @@ function renderChildren(){
     const row=document.createElement('div'); row.className='crow';
     row.innerHTML=`<div class="avatar" style="background:${c.color};width:38px;height:38px;border-radius:11px;font-size:16px">${initials(c.name)}</div>
       <input value="${esc(c.name)}" maxlength="24" aria-label="Prénom"/>
+      <button class="rowbtn" title="Fiche de l'enfant">Fiche ›</button>
       <button class="mini" title="Couleur">🎨</button>
       <button class="mini del" title="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14"/></svg></button>`;
+    row.querySelector('.rowbtn').onclick=()=>openProfile(c.id,'children');
     const inp=row.querySelector('input');
     inp.addEventListener('input',()=>{ c.name=inp.value; persistChildren(); });
     inp.addEventListener('blur',()=>{ if(!c.name.trim()){ c.name='Enfant'; inp.value=c.name; persistChildren(); } row.querySelector('.avatar').textContent=initials(c.name); });
@@ -603,10 +657,11 @@ function doAddChild(){
   const n=document.getElementById('newName').value.trim(); if(!n){ toast('Écris un prénom 🙂'); return; }
   if(!CHILDREN) CHILDREN=[];
   const color=AVCOLORS[CHILDREN.length % AVCOLORS.length];
-  CHILDREN.push({id:'c'+Date.now()+Math.floor(Math.random()*999),name:n,color});
+  const nid='c'+Date.now()+Math.floor(Math.random()*999);
+  CHILDREN.push({id:nid,name:n,color,birthdate:'',mother:{name:'',phone:'',email:''},father:{name:'',phone:'',email:''},contacts:[],notes:''});
   usingDemo=false; persistChildren(); closeModal();
-  if(VIEW==='children') renderChildren(); else { renderHome(); }
-  toast(n+' ajouté(e) ✅');
+  toast(n+' ajouté(e) ✅ — complète sa fiche');
+  openProfile(nid,'children');
 }
 function confirmDeleteChild(idx){
   const c=CHILDREN[idx];
@@ -694,6 +749,99 @@ function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g,m=>({'&':'&amp
 function initials(n){ n=(n||'').trim(); if(!n) return '?'; const p=n.split(/\s+/); return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase(); }
 function capitalize(s){ return s? s.charAt(0).toUpperCase()+s.slice(1):s; }
 function hex2rgba(hex,a){ const h=hex.replace('#',''); const r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16); return `rgba(${r},${g},${b},${a})`; }
+
+/* ---------- Profile & emergency card ---------- */
+let PROF_CTX={}, CARD_CTX={};
+function ensureProfile(c){ if(!c) return c; if(!c.mother)c.mother={name:'',phone:'',email:''}; if(!c.father)c.father={name:'',phone:'',email:''}; if(!Array.isArray(c.contacts))c.contacts=[]; if(c.birthdate==null)c.birthdate=''; if(c.notes==null)c.notes=''; return c; }
+function isDemoId(id){ return usingDemo || String(id).startsWith('demo'); }
+function ageStr(bd){ if(!bd) return ''; const p=bd.split('-').map(Number); const b=new Date(p[0],p[1]-1,p[2]); const n=new Date(); let months=(n.getFullYear()-b.getFullYear())*12+(n.getMonth()-b.getMonth()); if(n.getDate()<b.getDate()) months--; if(months<0) return ''; const y=Math.floor(months/12), m=months%12; if(y<=0) return (m||0)+' mois'; if(m===0) return y+' an'+(y>1?'s':''); return y+' an'+(y>1?'s':'')+' '+m+' mois'; }
+function frDate(bd){ if(!bd) return ''; const [y,m,d]=bd.split('-'); return d+'/'+m+'/'+y; }
+function telHref(n){ return (n||'').replace(/[^0-9+]/g,''); }
+function openProfile(id,from){ PROF_CTX={childId:id,from}; renderProfile(); setView('profile'); }
+function openCard(id,from){ CARD_CTX={childId:id,from}; renderCard(); setView('card'); }
+
+function renderProfile(){
+  const c=ensureProfile(childList().find(x=>x.id===PROF_CTX.childId)); if(!c){ goHome(); return; }
+  const demo=isDemoId(c.id);
+  const b=document.getElementById('profileBody');
+  b.innerHTML=`
+   <div class="page-h"><div><h1>Fiche enfant</h1><div class="sub">Infos & contacts</div></div>
+     <button class="btn btn-primary btn-sm" style="width:auto" onclick="openCard('${c.id}','profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Voir</button></div>
+   ${demo?'<div class="banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><div>Exemple non enregistré. Ajoute un vrai enfant pour saisir ces infos.</div></div>':''}
+   <div class="group">
+     <h3><span class="gd" style="background:${c.color}"></span>Identité</h3>
+     <div class="field"><label>Prénom</label><input id="pf-name" value="${esc(c.name)}"></div>
+     <div class="field"><label>Date de naissance</label><input id="pf-bd" type="date" value="${esc(c.birthdate)}"><div id="pf-age" style="margin-top:8px"></div></div>
+   </div>
+   <div class="group">
+     <h3><span class="gd" style="background:#E77FAE"></span>Maman</h3>
+     <div class="field"><label>Nom</label><input id="pf-mo-name" value="${esc(c.mother.name)}"></div>
+     <div class="two"><div class="field"><label>Téléphone</label><input id="pf-mo-phone" type="tel" inputmode="tel" value="${esc(c.mother.phone)}"></div>
+     <div class="field"><label>Email</label><input id="pf-mo-email" type="email" inputmode="email" autocapitalize="off" spellcheck="false" value="${esc(c.mother.email)}"></div></div>
+   </div>
+   <div class="group">
+     <h3><span class="gd" style="background:#4A97E0"></span>Papa</h3>
+     <div class="field"><label>Nom</label><input id="pf-fa-name" value="${esc(c.father.name)}"></div>
+     <div class="two"><div class="field"><label>Téléphone</label><input id="pf-fa-phone" type="tel" inputmode="tel" value="${esc(c.father.phone)}"></div>
+     <div class="field"><label>Email</label><input id="pf-fa-email" type="email" inputmode="email" autocapitalize="off" spellcheck="false" value="${esc(c.father.email)}"></div></div>
+   </div>
+   <div class="group">
+     <h3><span class="gd" style="background:#EFA636"></span>Autorisés à récupérer l'enfant</h3>
+     <div id="pf-contacts"></div>
+     <button class="addline" onclick="addContact('${c.id}')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Ajouter une personne</button>
+   </div>
+   <div class="group">
+     <h3><span class="gd" style="background:#6FBE4E"></span>Infos importantes</h3>
+     <div class="field"><textarea id="pf-notes" rows="3" placeholder="Allergies, médecin traitant, PAI, doudou, habitudes…">${esc(c.notes)}</textarea></div>
+   </div>`;
+  const bind=(id,fn)=>{ const el=document.getElementById(id); if(el) el.addEventListener('input',()=>{ fn(el.value); if(!demo) persistChildren(); }); };
+  const ageEl=document.getElementById('pf-age');
+  const showAge=()=>{ ageEl.innerHTML = c.birthdate ? `<span class="age-chip">🎂 ${ageStr(c.birthdate)} · né(e) le ${frDate(c.birthdate)}</span>` : ''; };
+  bind('pf-name',v=>c.name=v);
+  bind('pf-bd',v=>{ c.birthdate=v; showAge(); });
+  bind('pf-mo-name',v=>c.mother.name=v); bind('pf-mo-phone',v=>c.mother.phone=v); bind('pf-mo-email',v=>c.mother.email=v);
+  bind('pf-fa-name',v=>c.father.name=v); bind('pf-fa-phone',v=>c.father.phone=v); bind('pf-fa-email',v=>c.father.email=v);
+  bind('pf-notes',v=>c.notes=v);
+  showAge(); renderContacts(c,demo);
+}
+function renderContacts(c,demo){
+  const host=document.getElementById('pf-contacts'); if(!host) return; host.innerHTML='';
+  if(!c.contacts.length){ host.innerHTML='<div class="empty-mini">Personne pour l\'instant. Ajoute grands-parents, nounou de secours…</div>'; }
+  c.contacts.forEach((ct,i)=>{
+    const d=document.createElement('div'); d.className='contact-card';
+    d.innerHTML=`<button class="rm" onclick="removeContact('${c.id}',${i})">Retirer</button>
+      <div class="field"><label>Nom</label><input value="${esc(ct.name)}" data-k="name"></div>
+      <div class="two"><div class="field"><label>Lien (ex : grand-mère)</label><input value="${esc(ct.relation)}" data-k="relation"></div>
+      <div class="field"><label>Téléphone</label><input type="tel" inputmode="tel" value="${esc(ct.phone)}" data-k="phone"></div></div>`;
+    d.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{ ct[inp.dataset.k]=inp.value; if(!demo) persistChildren(); }));
+    host.appendChild(d);
+  });
+}
+function addContact(id){ const c=ensureProfile(childList().find(x=>x.id===id)); c.contacts.push({name:'',relation:'',phone:''}); if(!isDemoId(id)) persistChildren(); renderContacts(c,isDemoId(id)); }
+function removeContact(id,i){ const c=childList().find(x=>x.id===id); c.contacts.splice(i,1); if(!isDemoId(id)) persistChildren(); renderContacts(c,isDemoId(id)); }
+
+function renderCard(){
+  const c=ensureProfile(childList().find(x=>x.id===CARD_CTX.childId)); if(!c){ goHome(); return; }
+  const b=document.getElementById('cardBody');
+  const tel=(num)=>num?`<a class="callbtn tel" href="tel:${telHref(num)}" aria-label="Appeler"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8 9.6a16 16 0 0 0 6 6l1.2-1.1a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2z"/></svg></a>`:'';
+  const mail=(m)=>m?`<a class="callbtn mail" href="mailto:${esc(m)}" aria-label="Écrire"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a>`:'';
+  const par=(role,p)=> (p.name||p.phone||p.email)?`<div class="prow"><div><div class="pnm">${esc(p.name||'—')}</div><div class="prole">${role}${p.phone?' · '+esc(p.phone):''}${p.email?' · '+esc(p.email):''}</div></div><div class="callbtns">${tel(p.phone)}${mail(p.email)}</div></div>`:'';
+  const parents=[par('Maman',c.mother),par('Papa',c.father)].filter(Boolean).join('')||'<div class="empty-mini">À compléter (bouton Modifier).</div>';
+  const contacts=c.contacts.filter(ct=>ct.name||ct.phone).map(ct=>`<div class="prow"><div><div class="pnm">${esc(ct.name||'—')}</div><div class="prole">${esc(ct.relation||'Autorisé(e)')}${ct.phone?' · '+esc(ct.phone):''}</div></div><div class="callbtns">${tel(ct.phone)}</div></div>`).join('')||'<div class="empty-mini">Personne renseignée.</div>';
+  b.innerHTML=`
+   <div class="page-h"><div><h1>Fiche récap</h1><div class="sub">Rappel & urgence</div></div>
+     <button class="btn btn-ghost btn-sm" style="width:auto" onclick="openProfile('${c.id}','card')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Modifier</button></div>
+   <div class="ecard">
+     <div class="ecard-top" style="background:${c.color}">
+       <div class="av">${initials(c.name)}</div>
+       <div><div class="nm">${esc(c.name)}</div><div class="bd">${c.birthdate?'🎂 '+ageStr(c.birthdate)+' · né(e) le '+frDate(c.birthdate):'Date de naissance à renseigner'}</div></div>
+     </div>
+     <div class="ecard-sec"><h4>Parents</h4>${parents}</div>
+     <div class="ecard-sec"><h4>Autorisés à récupérer l'enfant</h4>${contacts}</div>
+     ${c.notes?`<div class="ecard-sec"><h4>Infos importantes</h4><div class="pinfo">${esc(c.notes)}</div></div>`:''}
+   </div>
+   <div class="footer-note">Ces infos restent sur cet iPhone et ne sont jamais envoyées aux parents.<br>Touche 📞 pour appeler directement.</div>`;
+}
 
 /* ---------- Init ---------- */
 renderHome(); setView('home');
