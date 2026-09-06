@@ -235,6 +235,11 @@ a.link{color:var(--teal);font-weight:800;text-decoration:none}
 .docact{width:37px;height:37px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--teal-d)}
 .docact svg{width:17px;height:17px}
 .docact.del{color:var(--danger)}
+.photobox{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.photobox .avatar{flex:0 0 auto;box-shadow:var(--shadow)}
+.photobtns{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.photobtn{border:1px solid var(--line);background:var(--surface);color:var(--teal-d);font-weight:800;border-radius:11px;padding:9px 14px;font-size:14px}
+.photobtn.del{border:none;background:none;color:var(--danger);padding:0 2px;font-size:13px}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -473,7 +478,7 @@ function childCard(c){
   SECTIONS.forEach(s=>{ const on=e&&e.sections[s.key]&&e.sections[s.key].on&&e.sections[s.key].text.trim();
     dots+=`<span class="dot" style="background:${on?COLORS[s.key]:'var(--surface-2)'}">${on?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>':''}</span>`; });
   btn.innerHTML=`${usingDemo?'<span class="badge-demo">exemple</span>':`<span class="cardinfo" role="button" title="Fiche" onclick="event.stopPropagation();openCard('${c.id}','home')">i</span>`}
-    <div class="avatar" style="background:${c.color}">${initials(c.name)}</div>
+    <div class="avatar" style="${avatarStyle(c)}">${avatarText(c)}</div>
     <div class="nm">${esc(c.name)}</div>
     <div class="meta">${n?n+' / '+total+' rempli'+(n>1?'s':''):'À remplir'}</div>
     <div class="status">${dots}</div>`;
@@ -650,7 +655,7 @@ function renderChildren(){
   rows.forEach(c=>{
     const idx=all.indexOf(c); const archived=c.archived;
     const row=document.createElement('div'); row.className='crow';
-    row.innerHTML=`<div class="avatar" style="background:${c.color};width:38px;height:38px;border-radius:11px;font-size:16px">${initials(c.name)}</div>
+    row.innerHTML=`<div class="avatar" style="${avatarStyle(c,'width:38px;height:38px;border-radius:11px;font-size:16px')}">${avatarText(c)}</div>
       <input value="${esc(c.name)}" maxlength="24" aria-label="Prénom"/>
       <button class="rowbtn" title="Fiche de l'enfant">Fiche ›</button>
       ${archived?`<button class="mini react" title="Réactiver" style="color:var(--teal-d)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3 8a9 9 0 1 0 2.6-3.8"/></svg></button>`:`<button class="mini col" title="Couleur">🎨</button>`}
@@ -686,7 +691,7 @@ function doAddChild(){
   if(!CHILDREN) CHILDREN=[];
   const color=AVCOLORS[CHILDREN.length % AVCOLORS.length];
   const nid='c'+Date.now()+Math.floor(Math.random()*999);
-  CHILDREN.push({id:nid,name:n,color,birthdate:'',contractStart:'',contractEnd:'',archived:false,mother:{name:'',phone:'',email:''},father:{name:'',phone:'',email:''},contacts:[],documents:[],notes:''});
+  CHILDREN.push({id:nid,name:n,color,photo:'',birthdate:'',contractStart:'',contractEnd:'',archived:false,mother:{name:'',phone:'',email:''},father:{name:'',phone:'',email:''},contacts:[],documents:[],notes:''});
   usingDemo=false; persistChildren(); closeModal();
   toast(n+' ajouté(e) ✅ — complète sa fiche');
   openProfile(nid,'children');
@@ -727,7 +732,7 @@ function renderHistory(){
   rows.forEach(r=>{
     const c=kids.find(x=>x.id===r.cid)||{name:'?',color:'#ccc'};
     const btn=document.createElement('button'); btn.className='hist-day';
-    btn.innerHTML=`<div class="avatar" style="background:${c.color};width:38px;height:38px;border-radius:11px;font-size:15px">${initials(c.name)}</div>
+    btn.innerHTML=`<div class="avatar" style="${avatarStyle(c,'width:38px;height:38px;border-radius:11px;font-size:15px')}">${avatarText(c)}</div>
       <div><div class="d">${capitalize(longDate(r.dk))}</div><div class="p">${esc(c.name)} · ${filledCount(r.e)||countAny(r.e)} rubrique(s)${r.e.sentAt?' · envoyée':''}</div></div>
       <svg class="chevrers" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>`;
     btn.onclick=()=>openHistEntry(r.cid,r.dk);
@@ -782,7 +787,9 @@ function hex2rgba(hex,a){ const h=hex.replace('#',''); const r=parseInt(h.substr
 
 /* ---------- Profile & emergency card ---------- */
 let PROF_CTX={}, CARD_CTX={};
-function ensureProfile(c){ if(!c) return c; if(!c.mother)c.mother={name:'',phone:'',email:''}; if(!c.father)c.father={name:'',phone:'',email:''}; if(!Array.isArray(c.contacts))c.contacts=[]; if(!Array.isArray(c.documents))c.documents=[]; if(c.birthdate==null)c.birthdate=''; if(c.notes==null)c.notes=''; if(c.contractStart==null)c.contractStart=''; if(c.contractEnd==null)c.contractEnd=''; if(typeof c.archived!=='boolean')c.archived=false; return c; }
+function ensureProfile(c){ if(!c) return c; if(!c.mother)c.mother={name:'',phone:'',email:''}; if(!c.father)c.father={name:'',phone:'',email:''}; if(!Array.isArray(c.contacts))c.contacts=[]; if(!Array.isArray(c.documents))c.documents=[]; if(c.birthdate==null)c.birthdate=''; if(c.notes==null)c.notes=''; if(c.contractStart==null)c.contractStart=''; if(c.contractEnd==null)c.contractEnd=''; if(typeof c.archived!=='boolean')c.archived=false; if(c.photo==null)c.photo=''; return c; }
+function avatarStyle(c,extra){ return (c&&c.photo)?`background-image:url('${c.photo}');background-size:cover;background-position:center;${extra||''}`:`background:${c?c.color:'#ccc'};${extra||''}`; }
+function avatarText(c){ return (c&&c.photo)?'':initials(c?c.name:''); }
 function isDemoId(id){ return usingDemo || String(id).startsWith('demo'); }
 function ageStr(bd){ if(!bd) return ''; const p=bd.split('-').map(Number); const b=new Date(p[0],p[1]-1,p[2]); const n=new Date(); let months=(n.getFullYear()-b.getFullYear())*12+(n.getMonth()-b.getMonth()); if(n.getDate()<b.getDate()) months--; if(months<0) return ''; const y=Math.floor(months/12), m=months%12; if(y<=0) return (m||0)+' mois'; if(m===0) return y+' an'+(y>1?'s':''); return y+' an'+(y>1?'s':'')+' '+m+' mois'; }
 function frDate(bd){ if(!bd) return ''; const [y,m,d]=bd.split('-'); return d+'/'+m+'/'+y; }
@@ -800,6 +807,13 @@ function renderProfile(){
    ${demo?'<div class="banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><div>Exemple non enregistré. Ajoute un vrai enfant pour saisir ces infos.</div></div>':''}
    <div class="group">
      <h3><span class="gd" style="background:${c.color}"></span>Identité</h3>
+     <div class="photobox">
+       <div class="avatar" style="width:66px;height:66px;border-radius:19px;font-size:26px;${avatarStyle(c)}">${avatarText(c)}</div>
+       <div class="photobtns">
+         <button class="photobtn" onclick="addPhoto('${c.id}')">${c.photo?'Changer la photo':'Ajouter une photo'}</button>
+         ${c.photo?`<button class="photobtn del" onclick="removePhoto('${c.id}')">Retirer</button>`:''}
+       </div>
+     </div>
      <div class="field"><label>Prénom</label><input id="pf-name" value="${esc(c.name)}"></div>
      <div class="field"><label>Date de naissance</label><input id="pf-bd" type="date" value="${esc(c.birthdate)}"><div id="pf-age" style="margin-top:8px"></div></div>
    </div>
@@ -903,7 +917,7 @@ function renderCard(){
      <button class="btn btn-ghost btn-sm" style="width:auto" onclick="openProfile('${c.id}','card')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Modifier</button></div>
    <div class="ecard">
      <div class="ecard-top" style="background:${c.color}">
-       <div class="av">${initials(c.name)}</div>
+       <div class="av" style="${c.photo?`background-image:url('${c.photo}');background-size:cover;background-position:center`:''}">${c.photo?'':initials(c.name)}</div>
        <div><div class="nm">${esc(c.name)}</div><div class="bd">${c.birthdate?'🎂 '+ageStr(c.birthdate)+' · né(e) le '+frDate(c.birthdate):'Date de naissance à renseigner'}</div></div>
      </div>
      ${(c.contractStart||c.contractEnd||c.archived)?`<div class="ecard-sec"><h4>Contrat</h4><div class="prow"><div><div class="pnm">${c.contractStart?frDate(c.contractStart):'—'}${c.contractEnd?' → '+frDate(c.contractEnd):(c.contractStart?' → en cours':'')}</div><div class="prole" style="${c.archived?'color:var(--danger)':''}">${c.archived?'Archivé — contrat terminé':'Contrat en cours'}</div></div></div></div>`:''}
@@ -988,6 +1002,28 @@ function doRemoveDoc(childId,id){
   idbDel(id).catch(()=>{});
   const c=childList().find(x=>x.id===childId); if(c) c.documents=c.documents.filter(x=>x.id!==id);
   persistChildren(); closeModal(); if(c) renderDocs(c); toast('Document retiré');
+}
+
+/* ---------- Child photo ---------- */
+function imgToAvatar(file){ return new Promise((res,rej)=>{ const img=new Image(); const u=URL.createObjectURL(file); img.onload=()=>{ try{ const S=256; const cv=document.createElement('canvas'); cv.width=S; cv.height=S; const ctx=cv.getContext('2d'); const min=Math.min(img.width,img.height); const sx=(img.width-min)/2, sy=(img.height-min)/2; ctx.drawImage(img,sx,sy,min,min,0,0,S,S); URL.revokeObjectURL(u); res(cv.toDataURL('image/jpeg',0.82)); }catch(e){ URL.revokeObjectURL(u); rej(e); } }; img.onerror=()=>{ URL.revokeObjectURL(u); rej(new Error('load')); }; img.src=u; }); }
+function addPhoto(childId){
+  if(isDemoId(childId)){ toast('Ajoute d\'abord un vrai enfant 🙂'); return; }
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange=async()=>{
+    const f=inp.files&&inp.files[0]; if(!f) return;
+    toast('Traitement de la photo…');
+    let dataUrl; try{ dataUrl=await imgToAvatar(f); }catch(e){ toast('Photo illisible.'); return; }
+    const c=ensureProfile(childList().find(x=>x.id===childId)); if(!c) return;
+    const prev=c.photo; c.photo=dataUrl;
+    if(!usingDemo && !LS.set(K_CHILD,CHILDREN)){ c.photo=prev; toast('Mémoire pleine — photo non enregistrée.'); return; }
+    if(VIEW==='profile') renderProfile();
+    toast('Photo ajoutée ✅');
+  };
+  inp.click();
+}
+function removePhoto(childId){
+  const c=childList().find(x=>x.id===childId); if(!c) return; c.photo=''; persistChildren();
+  if(VIEW==='profile') renderProfile(); toast('Photo retirée');
 }
 
 /* ---------- Init ---------- */
