@@ -450,8 +450,12 @@ function renderHome(){
   if(usingDemo){
     body.innerHTML = `<div class="banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><div>Voici un <b>exemple</b> pour montrer à quoi ça ressemble. Touche <b>Ajouter un enfant</b> pour mettre les vrais prénoms — l'exemple disparaîtra.</div></div>`;
   } else { body.innerHTML=''; }
+  const activeKids=usingDemo?kids:kids.filter(c=>!c.archived);
+  if(!usingDemo && activeKids.length===0 && kids.length>0){
+    body.innerHTML=`<div class="banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg><div>Aucun enfant actif pour l'instant. Tes contrats terminés sont dans <b>Enfants › Archivés</b>.</div></div>`;
+  }
   const grid=document.createElement('div'); grid.className='grid';
-  kids.forEach(c=>grid.appendChild(childCard(c)));
+  activeKids.forEach(c=>grid.appendChild(childCard(c)));
   // add-child card
   const add=document.createElement('button'); add.className='addcard'; add.onclick=addChild;
   add.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Ajouter un enfant`;
@@ -516,7 +520,7 @@ function updateFilledPill(){ const e=getEntry(CURRENT.childId,CURRENT.dateKey,fa
 function openPreview(){ reviewQueue=null; buildPreview(CURRENT.childId,CURRENT.dateKey); setView('preview'); }
 function startEndOfDay(){
   if(usingDemo){ toast('Ajoute d\'abord tes enfants 🙂'); return; }
-  const kids=childList().filter(c=>{ const e=getEntry(c.id,TODAY,false); return entryHasContent(e); });
+  const kids=childList().filter(c=>{ if(c.archived) return false; const e=getEntry(c.id,TODAY,false); return entryHasContent(e); });
   if(kids.length===0){ toast('Rien à envoyer pour l\'instant.'); return; }
   reviewQueue=kids.map(c=>c.id); reviewIdx=0;
   CURRENT={childId:reviewQueue[0],dateKey:TODAY};
@@ -630,26 +634,33 @@ async function makePdfBlob(childId,dateKey,include){
 function downloadBlob(blob,name){ const u=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),3000); }
 
 /* ---------- CHILDREN manager ---------- */
-function showChildren(){ renderChildren(); setView('children'); }
+let childTab='actifs';
+function setChildTab(t){ childTab=t; renderChildren(); }
+function showChildren(){ childTab='actifs'; renderChildren(); setView('children'); }
 function renderChildren(){
-  const list=document.getElementById('childList'); list.innerHTML='';
   if(usingDemo) CHILDREN=[];
-  (CHILDREN||[]).forEach((c,idx)=>{
+  const list=document.getElementById('childList');
+  const all=CHILDREN||[];
+  const actifs=all.filter(c=>!c.archived), arch=all.filter(c=>c.archived);
+  list.innerHTML=`<div class="seg"><button class="${childTab==='actifs'?'on':''}" onclick="setChildTab('actifs')">Actifs (${actifs.length})</button><button class="${childTab==='archives'?'on':''}" onclick="setChildTab('archives')">Archivés (${arch.length})</button></div>`;
+  const rows = childTab==='archives'?arch:actifs;
+  if(rows.length===0){ const e=document.createElement('div'); e.className='empty-mini'; e.style.padding='10px 2px 4px'; e.textContent = childTab==='archives'?'Aucun enfant archivé.':(all.length?'Aucun enfant actif.':'Aucun enfant pour l\'instant. Touche « Ajouter un enfant ».'); list.appendChild(e); }
+  rows.forEach(c=>{
+    const idx=all.indexOf(c); const archived=c.archived;
     const row=document.createElement('div'); row.className='crow';
     row.innerHTML=`<div class="avatar" style="background:${c.color};width:38px;height:38px;border-radius:11px;font-size:16px">${initials(c.name)}</div>
       <input value="${esc(c.name)}" maxlength="24" aria-label="Prénom"/>
       <button class="rowbtn" title="Fiche de l'enfant">Fiche ›</button>
-      <button class="mini" title="Couleur">🎨</button>
+      ${archived?`<button class="mini react" title="Réactiver" style="color:var(--teal-d)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3 8a9 9 0 1 0 2.6-3.8"/></svg></button>`:`<button class="mini col" title="Couleur">🎨</button>`}
       <button class="mini del" title="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14"/></svg></button>`;
     row.querySelector('.rowbtn').onclick=()=>openProfile(c.id,'children');
     const inp=row.querySelector('input');
     inp.addEventListener('input',()=>{ c.name=inp.value; persistChildren(); });
     inp.addEventListener('blur',()=>{ if(!c.name.trim()){ c.name='Enfant'; inp.value=c.name; persistChildren(); } row.querySelector('.avatar').textContent=initials(c.name); });
-    row.querySelector('.mini:not(.del)').onclick=()=>colorPicker(c,row);
+    if(archived){ row.querySelector('.react').onclick=()=>reactivateChild(c.id); } else { row.querySelector('.col').onclick=()=>colorPicker(c,row); }
     row.querySelector('.del').onclick=()=>confirmDeleteChild(idx);
     list.appendChild(row);
   });
-  if((CHILDREN||[]).length===0){ list.innerHTML='<div class="empty" style="padding:20px 8px"><div>Aucun enfant pour l\'instant.</div></div>'; }
 }
 function colorPicker(c,row){
   openModal(`<h3>Couleur de ${esc(c.name)}</h3><p>Choisis une couleur pour le repérer vite.</p>
@@ -673,7 +684,7 @@ function doAddChild(){
   if(!CHILDREN) CHILDREN=[];
   const color=AVCOLORS[CHILDREN.length % AVCOLORS.length];
   const nid='c'+Date.now()+Math.floor(Math.random()*999);
-  CHILDREN.push({id:nid,name:n,color,birthdate:'',mother:{name:'',phone:'',email:''},father:{name:'',phone:'',email:''},contacts:[],documents:[],notes:''});
+  CHILDREN.push({id:nid,name:n,color,birthdate:'',contractStart:'',contractEnd:'',archived:false,mother:{name:'',phone:'',email:''},father:{name:'',phone:'',email:''},contacts:[],documents:[],notes:''});
   usingDemo=false; persistChildren(); closeModal();
   toast(n+' ajouté(e) ✅ — complète sa fiche');
   openProfile(nid,'children');
@@ -769,7 +780,7 @@ function hex2rgba(hex,a){ const h=hex.replace('#',''); const r=parseInt(h.substr
 
 /* ---------- Profile & emergency card ---------- */
 let PROF_CTX={}, CARD_CTX={};
-function ensureProfile(c){ if(!c) return c; if(!c.mother)c.mother={name:'',phone:'',email:''}; if(!c.father)c.father={name:'',phone:'',email:''}; if(!Array.isArray(c.contacts))c.contacts=[]; if(!Array.isArray(c.documents))c.documents=[]; if(c.birthdate==null)c.birthdate=''; if(c.notes==null)c.notes=''; return c; }
+function ensureProfile(c){ if(!c) return c; if(!c.mother)c.mother={name:'',phone:'',email:''}; if(!c.father)c.father={name:'',phone:'',email:''}; if(!Array.isArray(c.contacts))c.contacts=[]; if(!Array.isArray(c.documents))c.documents=[]; if(c.birthdate==null)c.birthdate=''; if(c.notes==null)c.notes=''; if(c.contractStart==null)c.contractStart=''; if(c.contractEnd==null)c.contractEnd=''; if(typeof c.archived!=='boolean')c.archived=false; return c; }
 function isDemoId(id){ return usingDemo || String(id).startsWith('demo'); }
 function ageStr(bd){ if(!bd) return ''; const p=bd.split('-').map(Number); const b=new Date(p[0],p[1]-1,p[2]); const n=new Date(); let months=(n.getFullYear()-b.getFullYear())*12+(n.getMonth()-b.getMonth()); if(n.getDate()<b.getDate()) months--; if(months<0) return ''; const y=Math.floor(months/12), m=months%12; if(y<=0) return (m||0)+' mois'; if(m===0) return y+' an'+(y>1?'s':''); return y+' an'+(y>1?'s':'')+' '+m+' mois'; }
 function frDate(bd){ if(!bd) return ''; const [y,m,d]=bd.split('-'); return d+'/'+m+'/'+y; }
@@ -789,6 +800,14 @@ function renderProfile(){
      <h3><span class="gd" style="background:${c.color}"></span>Identité</h3>
      <div class="field"><label>Prénom</label><input id="pf-name" value="${esc(c.name)}"></div>
      <div class="field"><label>Date de naissance</label><input id="pf-bd" type="date" value="${esc(c.birthdate)}"><div id="pf-age" style="margin-top:8px"></div></div>
+   </div>
+   <div class="group">
+     <h3><span class="gd" style="background:#47978A"></span>Contrat</h3>
+     <div class="two">
+       <div class="field"><label>Début du contrat</label><input id="pf-cs" type="date" value="${esc(c.contractStart)}"></div>
+       <div class="field"><label>Fin du contrat</label><input id="pf-ce" type="date" value="${esc(c.contractEnd)}"></div>
+     </div>
+     <div id="pf-contract"></div>
    </div>
    <div class="group">
      <h3><span class="gd" style="background:#E77FAE"></span>Maman</h3>
@@ -821,10 +840,36 @@ function renderProfile(){
   const showAge=()=>{ ageEl.innerHTML = c.birthdate ? `<span class="age-chip">🎂 ${ageStr(c.birthdate)} · né(e) le ${frDate(c.birthdate)}</span>` : ''; };
   bind('pf-name',v=>c.name=v);
   bind('pf-bd',v=>{ c.birthdate=v; showAge(); });
+  bind('pf-cs',v=>c.contractStart=v);
+  const ceEl=document.getElementById('pf-ce');
+  if(ceEl) ceEl.addEventListener('change',()=>{ c.contractEnd=ceEl.value; if(!demo) persistChildren(); renderContract(c); if(!demo && ceEl.value && ceEl.value<=todayKey() && !c.archived) promptArchive(c.id); });
   bind('pf-mo-name',v=>c.mother.name=v); bind('pf-mo-phone',v=>c.mother.phone=v); bind('pf-mo-email',v=>c.mother.email=v);
   bind('pf-fa-name',v=>c.father.name=v); bind('pf-fa-phone',v=>c.father.phone=v); bind('pf-fa-email',v=>c.father.email=v);
   bind('pf-notes',v=>c.notes=v);
-  showAge(); renderContacts(c,demo); renderDocs(c);
+  showAge(); renderContacts(c,demo); renderDocs(c); renderContract(c);
+}
+function renderContract(c){
+  const h=document.getElementById('pf-contract'); if(!h) return;
+  if(c.archived){
+    h.innerHTML=`<div class="banner" style="background:var(--surface-2);border-color:var(--line);color:var(--muted)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg><div><b>Enfant archivé</b> (contrat terminé). Il n'apparaît plus dans la journée, mais sa fiche, ses documents et son historique restent consultables ici.</div></div>
+      <button class="btn btn-ghost" onclick="reactivateChild('${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3 8a9 9 0 1 0 2.6-3.8"/></svg>Réactiver l'enfant</button>`;
+  } else {
+    h.innerHTML=`<button class="btn btn-ghost" onclick="promptArchive('${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>Archiver (fin de contrat)</button>`;
+  }
+}
+function promptArchive(id){
+  const c=childList().find(x=>x.id===id); if(!c) return;
+  openModal(`<h3>Archiver ${esc(c.name)} ?</h3><p>Fin de contrat : l'enfant n'apparaîtra plus dans la journée, mais sa fiche, ses documents et son historique restent consultables dans les Archives.</p>
+    <div class="btn-row"><button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+    <button class="btn btn-primary" onclick="archiveChild('${id}')">Archiver</button></div>`);
+}
+function archiveChild(id){
+  const c=childList().find(x=>x.id===id); if(!c) return; c.archived=true; if(!c.contractEnd) c.contractEnd=todayKey(); persistChildren(); closeModal(); toast(c.name+' archivé(e) 📦');
+  if(VIEW==='profile') renderProfile(); else if(VIEW==='children') renderChildren(); else goHome();
+}
+function reactivateChild(id){
+  const c=childList().find(x=>x.id===id); if(!c) return; c.archived=false; persistChildren(); toast(c.name+' réactivé(e) ✅');
+  if(VIEW==='profile') renderProfile(); else if(VIEW==='children') renderChildren();
 }
 function renderContacts(c,demo){
   const host=document.getElementById('pf-contacts'); if(!host) return; host.innerHTML='';
@@ -859,6 +904,7 @@ function renderCard(){
        <div class="av">${initials(c.name)}</div>
        <div><div class="nm">${esc(c.name)}</div><div class="bd">${c.birthdate?'🎂 '+ageStr(c.birthdate)+' · né(e) le '+frDate(c.birthdate):'Date de naissance à renseigner'}</div></div>
      </div>
+     ${(c.contractStart||c.contractEnd||c.archived)?`<div class="ecard-sec"><h4>Contrat</h4><div class="prow"><div><div class="pnm">${c.contractStart?frDate(c.contractStart):'—'}${c.contractEnd?' → '+frDate(c.contractEnd):(c.contractStart?' → en cours':'')}</div><div class="prole" style="${c.archived?'color:var(--danger)':''}">${c.archived?'Archivé — contrat terminé':'Contrat en cours'}</div></div></div></div>`:''}
      <div class="ecard-sec"><h4>Parents</h4>${parents}</div>
      <div class="ecard-sec"><h4>Autorisés à récupérer l'enfant</h4>${contacts}</div>
      ${docsHtml}
