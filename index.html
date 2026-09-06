@@ -524,14 +524,14 @@ function renderEditor(){
 function updateFilledPill(){ const e=getEntry(CURRENT.childId,CURRENT.dateKey,false); document.getElementById('editFilled').textContent=filledCount(e)+' / '+SECTIONS.length; }
 
 /* ---------- PREVIEW / REVIEW ---------- */
-function openPreview(){ reviewQueue=null; buildPreview(CURRENT.childId,CURRENT.dateKey); setView('preview'); }
+function openPreview(){ reviewQueue=null; setView('preview'); buildPreview(CURRENT.childId,CURRENT.dateKey); }
 function startEndOfDay(){
   if(usingDemo){ toast('Ajoute d\'abord tes enfants 🙂'); return; }
   const kids=childList().filter(c=>{ if(c.archived) return false; const e=getEntry(c.id,TODAY,false); return entryHasContent(e); });
   if(kids.length===0){ toast('Rien à envoyer pour l\'instant.'); return; }
   reviewQueue=kids.map(c=>c.id); reviewIdx=0;
   CURRENT={childId:reviewQueue[0],dateKey:TODAY};
-  buildPreview(CURRENT.childId,TODAY); setView('preview');
+  setView('preview'); buildPreview(CURRENT.childId,TODAY);
 }
 let PREV_INCLUDE={};
 function buildPreview(childId,dateKey){
@@ -575,8 +575,9 @@ function sheetHTML(childId,dateKey,include){
 function renderSheet(){
   const host=document.getElementById('sheetScale');
   host.innerHTML=sheetHTML(CURRENT.childId,CURRENT.dateKey,PREV_INCLUDE);
-  // scale 794px sheet to container width
+  // scale 794px sheet to container width — wait until the view is visible (width > 0)
   const wrap=host.parentElement; const avail=wrap.clientWidth-28;
+  if(avail<=0){ requestAnimationFrame(renderSheet); return; }
   const scale=Math.min(1, avail/794);
   host.style.transform='scale('+scale+')';
   const sh=host.querySelector('.sheet');
@@ -593,7 +594,7 @@ function saveOnly(){
 function nextOrHome(msg){
   if(reviewQueue && reviewIdx < reviewQueue.length-1){
     reviewIdx++; CURRENT={childId:reviewQueue[reviewIdx],dateKey:TODAY};
-    buildPreview(CURRENT.childId,TODAY); setView('preview'); toast(msg);
+    setView('preview'); buildPreview(CURRENT.childId,TODAY); toast(msg);
   } else { reviewQueue=null; toast(msg); goHome(); }
 }
 async function sendFiche(){
@@ -752,7 +753,7 @@ function openHistEntry(cid,dk){
     tg.onclick=()=>{ PREV_INCLUDE[s.key]=!PREV_INCLUDE[s.key]; tg.classList.toggle('on',PREV_INCLUDE[s.key]); tg.querySelector('.tdot').style.background=PREV_INCLUDE[s.key]?COLORS[s.key]:'var(--line)'; renderSheet(); };
     if(!has) tg.style.opacity=.5; tw.appendChild(tg);
   });
-  renderSheet(); setView('preview');
+  setView('preview'); renderSheet();
 }
 function pruneOld(){
   const cutoff=new Date(); cutoff.setFullYear(cutoff.getFullYear()-1);
