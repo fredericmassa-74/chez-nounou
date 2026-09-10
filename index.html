@@ -34,6 +34,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{
   background:var(--bg); color:var(--ink);
   font-family:"Nunito",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
@@ -129,7 +130,8 @@ textarea:focus{outline:none;border-color:var(--teal);background:var(--surface)}
 /* Fiche (sheet) — always light, it is a document */
 .sheet-wrap{background:#e9e4db;border-radius:var(--radius);padding:14px;overflow:hidden}
 .sheet-scale{transform-origin:top left}
-.sheet{width:794px;min-height:1000px;background:#fff;color:#2E2A26;padding:46px 44px;font-family:"Nunito",sans-serif;box-shadow:0 4px 20px rgba(0,0,0,.12)}
+.sheet{width:794px;min-height:1000px;background:#fff;color:#2E2A26;padding:46px 44px;font-family:"Nunito",sans-serif;box-shadow:0 4px 20px rgba(0,0,0,.12);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.sheet .s-box,.sheet .s-sec,.sheet *{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .sheet .s-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:6px}
 .sheet .s-title{font-family:"Fredoka",sans-serif;font-weight:600;font-size:34px;color:#47978A;letter-spacing:.5px;text-transform:uppercase;line-height:1.05;margin:0}
 .sheet .s-sub{font-weight:800;color:#6b6459;font-size:17px;margin-top:8px;text-transform:capitalize}
