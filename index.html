@@ -259,6 +259,10 @@ a.link{color:var(--teal);font-weight:800;text-decoration:none}
 .osheet .o-it .dt{color:#8a8177;font-size:12.5px;margin-left:4px}
 .osheet .b-bh{font-family:"Fredoka",sans-serif;font-weight:600;font-size:20px;color:#47978A;margin:22px 0 10px;padding-bottom:6px;border-bottom:2px solid #eceae4}
 .osheet .b-bracket{margin-bottom:8px}
+.osheet .frise{margin:8px 0 16px;background:#f6f2ec;border:1px solid #eceae4;border-radius:14px;padding:12px 14px 10px}
+.osheet .fr-h{font-family:"Fredoka",sans-serif;font-weight:600;font-size:16px;color:#47978A;margin-bottom:2px}
+.osheet .fr-leg{font-size:11px;color:#8a8177;margin-top:2px}
+.pageblock{break-inside:avoid}
 .docrow{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px;background:var(--surface-2)}
 .docrow .di{width:36px;height:36px;border-radius:10px;background:#EDE9FB;display:grid;place-items:center;flex:0 0 auto;color:#6C5AC7}
 .docrow .di svg{width:19px;height:19px}
@@ -1274,25 +1278,60 @@ function osheetHTML(o){
     const col=OBS_DOMCOL[di%OBS_DOMCOL.length];
     const items=dom.items.map((it,ii)=>{ const on=!!o.items[di+'-'+ii]; return `<div class="o-it"><span class="mk" style="color:${on?col:'#c9c2b6'}">${on?'☑':'☐'}</span> <span style="${on?'font-weight:700':'color:#8a8177'}">${esc(it)}</span></div>`; }).join('');
     const note=o.notes[di]&&o.notes[di].trim()?`<div class="o-note"><b>Précisions :</b> ${esc(o.notes[di])}</div>`:'';
-    return `<div class="o-dom"><div class="o-dh" style="color:${col}">${di+1}. ${esc(dom.t)}</div>${items}${note}<div class="o-vig"><b>Point de vigilance —</b> ${esc(dom.v)}</div></div>`;
+    return `<div class="o-dom pageblock"><div class="o-dh" style="color:${col}">${di+1}. ${esc(dom.t)}</div>${items}${note}<div class="o-vig"><b>Point de vigilance —</b> ${esc(dom.v)}</div></div>`;
   }).join('');
   return `<div class="osheet" id="theOsheet">
-    <h1>Observations — ${GRID_LABEL[o.grid]}</h1>
-    <div class="o-sub">${esc(c?c.name:'')}${c&&c.birthdate?' · né(e) le '+frDate(c.birthdate):''}${m!=null?' · '+m+' mois':''} · ${longDate(o.date)}</div>
-    <div class="o-princ">${esc(OBS_PRINCIPE)}</div>
-    <div class="o-ctx"><b>Contexte :</b> ${ctx.length?esc(ctx.join(', ')):'—'}</div>
+    <div class="pageblock">
+      <h1>Observations — ${GRID_LABEL[o.grid]}</h1>
+      <div class="o-sub">${esc(c?c.name:'')}${c&&c.birthdate?' · né(e) le '+frDate(c.birthdate):''}${m!=null?' · '+m+' mois':''} · ${longDate(o.date)}</div>
+      <div class="o-princ">${esc(OBS_PRINCIPE)}</div>
+      <div class="o-ctx"><b>Contexte :</b> ${ctx.length?esc(ctx.join(', ')):'—'}</div>
+    </div>
     ${doms}
-    <div class="o-dom"><div class="o-dh" style="color:#6FBE4E">Remarques / observations complémentaires</div><div class="o-rem">${o.remarques&&o.remarques.trim()?esc(o.remarques).replace(/\n/g,'<br>'):'—'}</div></div>
-    <div class="o-ctx"><b>Suite à donner :</b> ${suite.length?esc(suite.join(', ')):'—'}</div>
-    <div class="o-imp">${esc(OBS_IMPORTANT)}</div>
-    <div class="s-foot" style="margin-top:20px">Document confidentiel — transmis par Nounou</div>
+    <div class="o-dom pageblock"><div class="o-dh" style="color:#6FBE4E">Remarques / observations complémentaires</div><div class="o-rem">${o.remarques&&o.remarques.trim()?esc(o.remarques).replace(/\n/g,'<br>'):'—'}</div></div>
+    <div class="o-ctx pageblock"><b>Suite à donner :</b> ${suite.length?esc(suite.join(', ')):'—'}</div>
+    <div class="o-imp pageblock">${esc(OBS_IMPORTANT)}</div>
+    <div class="s-foot pageblock" style="margin-top:20px">Document confidentiel — transmis par Nounou</div>
   </div>`;
+}
+function padForPages(sheet){
+  const pageH = sheet.offsetWidth * (841.89/595.28);
+  const blocks=[...sheet.querySelectorAll('.pageblock')];
+  for(const el of blocks){
+    const h=el.offsetHeight; if(h<=0 || h>=pageH-6) continue;
+    const top=el.offsetTop; const rem=((top % pageH)+pageH)%pageH;
+    if(rem + h > pageH){ const sp=document.createElement('div'); sp.setAttribute('aria-hidden','true'); sp.style.cssText='width:1px;height:'+(pageH-rem+2)+'px'; el.parentNode.insertBefore(sp, el); }
+  }
 }
 async function makeSheetPdf(htmlString){
   const holder=document.createElement('div'); holder.style.cssText='position:fixed;left:-10000px;top:0;width:794px;background:#fff;'; holder.innerHTML=htmlString; document.body.appendChild(holder);
   const sheet=holder.firstElementChild; await document.fonts.ready.catch(()=>{});
+  try{ padForPages(sheet); }catch(e){}
   try{ const canvas=await html2canvas(sheet,{scale:2,backgroundColor:'#ffffff',useCORS:true,windowWidth:794}); const {jsPDF}=window.jspdf; const pdf=new jsPDF('p','pt','a4'); const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight(); const imgW=pw,imgH=canvas.height*imgW/canvas.width; const img=canvas.toDataURL('image/jpeg',0.94); let hLeft=imgH; pdf.addImage(img,'JPEG',0,0,imgW,imgH); hLeft-=ph; while(hLeft>0){ const pos=hLeft-imgH; pdf.addPage(); pdf.addImage(img,'JPEG',0,pos,imgW,imgH); hLeft-=ph; } return pdf.output('blob'); }
   finally{ document.body.removeChild(holder); }
+}
+function ageMonthsAt(bd,dk){ if(!bd) return null; const p=bd.split('-').map(Number); const b=new Date(p[0],p[1]-1,p[2]); const d=dk.split('-').map(Number); const n=new Date(d[0],d[1]-1,d[2]); let m=(n.getFullYear()-b.getFullYear())*12+(n.getMonth()-b.getMonth()); if(n.getDate()<b.getDate()) m--; return m<0?0:m; }
+function bilanTimelineHTML(childId,brackets){
+  const c=childList().find(x=>x.id===childId);
+  const obs=obsForChild(childId).filter(o=>brackets.includes(o.grid)).slice().sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+  if(!obs.length) return '';
+  let total=0; brackets.forEach(bk=>(GRIDS[bk]||[]).forEach(d=>total+=d.items.length)); if(!total) total=1;
+  const seen=new Set(); const pts=obs.map(o=>{ (GRIDS[o.grid]||[]).forEach((d,di)=>d.items.forEach((it,ii)=>{ if(o.items[di+'-'+ii]) seen.add(o.grid+'|'+di+'-'+ii); })); return {date:o.date, age:ageMonthsAt(c&&c.birthdate,o.date), cum:seen.size}; });
+  const W=710,H=150,padL=34,padR=34,topY=26,botY=104;
+  const n=pts.length; const xs=n===1?[W/2]:pts.map((p,i)=>padL+(W-padL-padR)*i/(n-1));
+  const y=cum=>botY-(botY-topY)*(cum/total);
+  let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">`;
+  svg+=`<line x1="${padL}" y1="${botY}" x2="${W-padR}" y2="${botY}" stroke="#e3ddd2" stroke-width="1.5"/>`;
+  if(n>1) svg+=`<polyline points="${pts.map((p,i)=>xs[i].toFixed(1)+','+y(p.cum).toFixed(1)).join(' ')}" fill="none" stroke="#47978A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+  pts.forEach((p,i)=>{ const x=xs[i],yy=y(p.cum);
+    svg+=`<line x1="${x}" y1="${yy}" x2="${x}" y2="${botY}" stroke="#e6e0d5" stroke-width="1"/>`;
+    svg+=`<circle cx="${x}" cy="${yy}" r="5" fill="#47978A"/>`;
+    svg+=`<text x="${x}" y="${yy-9}" text-anchor="middle" font-size="12.5" font-weight="700" fill="#37776C">${p.cum}</text>`;
+    svg+=`<text x="${x}" y="${botY+17}" text-anchor="middle" font-size="11" font-weight="700" fill="#5a544c">${frDate(p.date).slice(0,5)}</text>`;
+    svg+=`<text x="${x}" y="${botY+31}" text-anchor="middle" font-size="10.5" fill="#8a8177">${p.age!=null?p.age+' m':''}</text>`;
+  });
+  svg+=`</svg>`;
+  return `<div class="pageblock frise"><div class="fr-h">Frise d'évolution</div>${svg}<div class="fr-leg">● compétences observées (cumulées), de la 1ʳᵉ à la dernière observation — sur ${total} au total pour ${brackets.length>1?"l'ensemble des tranches":'cette tranche'}.</div></div>`;
 }
 async function shareSheetPdf(htmlString,fname,text){
   toast('Préparation du PDF…');
@@ -1323,22 +1362,25 @@ function bsheetHTML(childId,brackets){
       const items=dom.items.map((it,ii)=>{ const key=di+'-'+ii; const fd=first[key]; return `<div class="o-it"><span class="mk" style="color:${fd?col:'#c9c2b6'}">${fd?'☑':'☐'}</span> <span style="${fd?'font-weight:700':'color:#8a8177'}">${esc(it)}</span>${fd?`<span class="dt">— observé le ${frDate(fd)}</span>`:''}</div>`; }).join('');
       const notes=obs.filter(o=>o.notes[di]&&o.notes[di].trim()).map(o=>frDate(o.date)+' : '+esc(o.notes[di]));
       const note=notes.length?`<div class="o-note"><b>Précisions :</b> ${notes.join(' · ')}</div>`:'';
-      doms+=`<div class="o-dom"><div class="o-dh" style="color:${col}">${di+1}. ${esc(dom.t)}</div>${items}${note}<div class="o-vig"><b>Point de vigilance —</b> ${esc(dom.v)}</div></div>`;
+      doms+=`<div class="o-dom pageblock"><div class="o-dh" style="color:${col}">${di+1}. ${esc(dom.t)}</div>${items}${note}<div class="o-vig"><b>Point de vigilance —</b> ${esc(dom.v)}</div></div>`;
     });
     const rems=obs.filter(o=>o.remarques&&o.remarques.trim()).map(o=>`<div style="margin-bottom:5px"><b>${frDate(o.date)} :</b> ${esc(o.remarques)}</div>`).join('')||'—';
     const suites=[...new Set(obs.reduce((a,o)=>a.concat(OBS_SUITE.filter((l,i)=>o.suite[i])),[]))];
-    body+=`<div class="b-bracket"><div class="b-bh">Tranche ${GRID_LABEL[bk]} — ${obs.length} observation(s)</div>
-      <div class="o-ctx"><b>Observations prises en compte :</b> ${dates}</div>${doms}
-      <div class="o-dom"><div class="o-dh" style="color:#6FBE4E">Remarques au fil des observations</div><div class="o-rem">${rems}</div></div>
-      <div class="o-ctx"><b>Suites évoquées :</b> ${suites.length?esc(suites.join(', ')):'—'}</div></div>`;
+    body+=`<div class="b-bracket"><div class="b-bh pageblock">Tranche ${GRID_LABEL[bk]} — ${obs.length} observation(s)</div>
+      <div class="o-ctx pageblock"><b>Observations prises en compte :</b> ${dates}</div>${doms}
+      <div class="o-dom pageblock"><div class="o-dh" style="color:#6FBE4E">Remarques au fil des observations</div><div class="o-rem">${rems}</div></div>
+      <div class="o-ctx pageblock"><b>Suites évoquées :</b> ${suites.length?esc(suites.join(', ')):'—'}</div></div>`;
   });
   return `<div class="osheet">
-    <h1>Bilan de synthèse</h1>
-    <div class="o-sub">${esc(c?c.name:'')}${c&&c.birthdate?' · né(e) le '+frDate(c.birthdate):''}${m!=null?' · '+m+' mois':''} · établi le ${longDate(todayKey())}</div>
-    <div class="o-princ">${esc(OBS_PRINCIPE)} Ce bilan réunit les observations faites au fil du temps ; ✓ indique la date de la première fois où la compétence a été observée.</div>
+    <div class="pageblock">
+      <h1>Bilan de synthèse</h1>
+      <div class="o-sub">${esc(c?c.name:'')}${c&&c.birthdate?' · né(e) le '+frDate(c.birthdate):''}${m!=null?' · '+m+' mois':''} · établi le ${longDate(todayKey())}</div>
+      <div class="o-princ">${esc(OBS_PRINCIPE)} Ce bilan réunit les observations faites au fil du temps ; ✓ indique la date de la première fois où la compétence a été observée.</div>
+    </div>
+    ${bilanTimelineHTML(childId,brackets)}
     ${body||'<div class="o-ctx">Aucune observation à synthétiser.</div>'}
-    <div class="o-imp">${esc(OBS_IMPORTANT)}</div>
-    <div class="s-foot" style="margin-top:20px">Document confidentiel — transmis par Nounou</div>
+    <div class="o-imp pageblock">${esc(OBS_IMPORTANT)}</div>
+    <div class="s-foot pageblock" style="margin-top:20px">Document confidentiel — transmis par Nounou</div>
   </div>`;
 }
 function generateBilan(childId){
