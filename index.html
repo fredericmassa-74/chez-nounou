@@ -227,6 +227,38 @@ a.link{color:var(--teal);font-weight:800;text-decoration:none}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pinfo{background:#3a3320;border-color:#5a4d2a;color:#ecd9a6}}
 :root[data-theme="dark"] .pinfo{background:#3a3320;border-color:#5a4d2a;color:#ecd9a6}
 .empty-mini{color:var(--muted);font-size:14px;font-weight:600;padding:4px 0 12px}
+/* Observations */
+.oselect{width:100%;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:11px;padding:11px 12px;font-family:inherit;font-size:15.5px;font-weight:700}
+.oselect:focus{outline:none;border-color:var(--teal);background:var(--surface)}
+.oitems{margin-bottom:4px}
+.oitem{display:flex;align-items:flex-start;gap:11px;padding:9px 2px}
+.oitem+.oitem{border-top:1px solid var(--line)}
+.oitem .ocheck{width:26px;height:26px;border-radius:8px;border:2px solid var(--line);flex:0 0 auto;display:grid;place-items:center;margin-top:1px;transition:background .12s}
+.oitem.on .ocheck{background:var(--accentc,#47978A);border-color:var(--accentc,#47978A)}
+.oitem .ocheck svg{width:16px;height:16px;opacity:0}
+.oitem.on .ocheck svg{opacity:1}
+.oitem .otxt{font-size:15px;font-weight:600;line-height:1.35;padding-top:2px}
+.oitem.on .otxt{color:var(--ink)}
+.ovig{background:var(--surface-2);border:1px solid var(--line);border-radius:11px;padding:9px 12px;font-size:12.5px;color:var(--muted);font-weight:600;line-height:1.45}
+.ovig b{color:var(--ink)}
+/* Observation PDF sheet */
+.osheet{width:794px;background:#fff;color:#2E2A26;padding:44px 42px;font-family:"Nunito",sans-serif;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.osheet *{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.osheet h1{font-family:"Fredoka",sans-serif;font-weight:600;color:#47978A;font-size:26px;text-transform:uppercase;margin:0 0 4px;letter-spacing:.4px}
+.osheet .o-sub{font-weight:800;color:#6b6459;font-size:15px;margin-bottom:10px}
+.osheet .o-princ{font-size:12px;color:#8a8177;font-style:italic;margin-bottom:12px;line-height:1.4}
+.osheet .o-ctx{font-size:14px;margin-bottom:14px;line-height:1.5}
+.osheet .o-dom{margin-bottom:16px}
+.osheet .o-dh{font-family:"Fredoka",sans-serif;font-weight:600;font-size:17px;margin-bottom:6px}
+.osheet .o-it{font-size:14.5px;line-height:1.7}
+.osheet .o-it .mk{font-size:16px}
+.osheet .o-note{background:#f5efe6;border-radius:10px;padding:8px 11px;font-size:13px;margin-top:5px;line-height:1.45}
+.osheet .o-vig{font-size:11.5px;color:#8a8177;margin-top:5px;line-height:1.4}
+.osheet .o-rem{background:#eef6e9;border-radius:12px;padding:12px;font-size:14px;white-space:pre-wrap;line-height:1.5}
+.osheet .o-imp{font-size:11px;color:#9a9a9a;margin-top:14px;line-height:1.45}
+.osheet .o-it .dt{color:#8a8177;font-size:12.5px;margin-left:4px}
+.osheet .b-bh{font-family:"Fredoka",sans-serif;font-weight:600;font-size:20px;color:#47978A;margin:22px 0 10px;padding-bottom:6px;border-bottom:2px solid #eceae4}
+.osheet .b-bracket{margin-bottom:8px}
 .docrow{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px;background:var(--surface-2)}
 .docrow .di{width:36px;height:36px;border-radius:10px;background:#EDE9FB;display:grid;place-items:center;flex:0 0 auto;color:#6C5AC7}
 .docrow .di svg{width:19px;height:19px}
@@ -317,6 +349,10 @@ a.link{color:var(--teal);font-weight:800;text-decoration:none}
     <section class="view" id="view-profile"><div id="profileBody"></div></section>
     <!-- EMERGENCY CARD (read-only) -->
     <section class="view" id="view-card"><div id="cardBody"></div></section>
+    <!-- OBSERVATIONS -->
+    <section class="view" id="view-obslist"><div id="obslistBody"></div></section>
+    <section class="view" id="view-obsedit"><div id="obseditBody"></div></section>
+    <section class="view" id="view-obsalert"><div id="obsalertBody"></div></section>
   </main>
 
   <!-- Sticky actions (editor & preview) -->
@@ -324,6 +360,13 @@ a.link{color:var(--teal);font-weight:800;text-decoration:none}
     <div class="in">
       <button class="btn btn-ghost" style="flex:0 0 auto;width:auto;padding-left:16px;padding-right:16px" onclick="goHome()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M9 21V12h6v9"/></svg></button>
       <button class="btn btn-primary" onclick="openPreview()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Vérifier & envoyer</button>
+    </div>
+  </div>
+  <div class="sticky-actions" id="stickyObs" hidden>
+    <div class="in">
+      <button class="btn btn-ghost" style="flex:0 0 auto;width:auto;padding:14px 16px" onclick="deleteObs()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14"/></svg></button>
+      <button class="btn btn-ghost" onclick="finishObs()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Terminer</button>
+      <button class="btn btn-primary" onclick="exportObs()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Exporter</button>
     </div>
   </div>
   <div class="sticky-actions" id="stickyPrev" hidden>
@@ -431,6 +474,7 @@ function setView(v){
   document.getElementById('view-'+v).classList.add('active');
   document.getElementById('stickyEdit').hidden = v!=='edit';
   document.getElementById('stickyPrev').hidden = v!=='preview';
+  document.getElementById('stickyObs').hidden = v!=='obsedit';
   const back=document.getElementById('backBtn'), brand=document.getElementById('brand');
   const showBack = v!=='home';
   back.hidden=!showBack; brand.style.display=showBack?'none':'flex';
@@ -444,6 +488,9 @@ function goBack(){
   else if(VIEW==='preview'){ renderEditor(); setView('edit'); }
   else if(VIEW==='profile'){ if(PROF_CTX.from==='card') openCard(PROF_CTX.childId,'children'); else if(PROF_CTX.from==='children') showChildren(); else goHome(); }
   else if(VIEW==='card'){ const f=CARD_CTX.from; if(f==='edit'){ CURRENT={childId:CARD_CTX.childId,dateKey:TODAY}; renderEditor(); setView('edit'); } else if(f==='profile') openProfile(CARD_CTX.childId,'children'); else if(f==='children') showChildren(); else goHome(); }
+  else if(VIEW==='obslist'){ openCard(OBSLIST_CHILD, OBS_CARD_FROM); }
+  else if(VIEW==='obsedit'){ openObsList(curObs()?curObs().childId:OBSLIST_CHILD); }
+  else if(VIEW==='obsalert'){ openObsList(OBSLIST_CHILD); }
   else if(VIEW==='children'||VIEW==='history') goHome();
   else goHome();
 }
@@ -773,7 +820,7 @@ async function exportBackup(){
   toast('Préparation de la sauvegarde…');
   const docs={};
   for(const c of CHILDREN){ if(Array.isArray(c.documents)){ for(const d of c.documents){ try{ const blob=await idbGet(d.id); if(blob){ docs[d.id]={type:d.type||blob.type||'application/octet-stream',name:d.name,b64:await blobToDataURL(blob)}; } }catch(e){} } } }
-  const data={app:'Chez Nounou',version:2,exportedAt:new Date().toISOString(),children:CHILDREN,entries:ENTRIES,docs};
+  const data={app:'Chez Nounou',version:2,exportedAt:new Date().toISOString(),children:CHILDREN,entries:ENTRIES,observations:OBS,docs};
   const blob=new Blob([JSON.stringify(data)],{type:'application/json'});
   const name='Sauvegarde Chez Nounou '+todayKey()+'.json';
   const file=new File([blob],name,{type:'application/json'});
@@ -800,6 +847,7 @@ async function doImportBackup(data){
   try{
     CHILDREN = data.children.map(c=>ensureProfile(c));
     ENTRIES = (data.entries && typeof data.entries==='object') ? data.entries : {};
+    if(data.observations && typeof data.observations==='object'){ OBS = data.observations; LS.set(K_OBS,OBS); }
     usingDemo=false;
     LS.set(K_CHILD,CHILDREN); LS.set(K_ENTRY,ENTRIES);
     if(data.docs && typeof data.docs==='object'){ for(const id in data.docs){ const d=data.docs[id]; try{ await idbPut(id, b64ToBlob(d.b64,d.type)); }catch(e){} } }
@@ -960,6 +1008,7 @@ function renderCard(){
      ${docsHtml}
      ${c.notes?`<div class="ecard-sec"><h4>Infos importantes</h4><div class="pinfo">${esc(c.notes)}</div></div>`:''}
    </div>
+   <button class="btn btn-ghost" onclick="openObsList('${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Observations (suivi du développement)${obsForChild(c.id).length?' · '+obsForChild(c.id).length:''}</button>
    <div class="footer-note">Ces infos restent sur cet iPhone et ne sont jamais envoyées aux parents.<br>Touche 📞 pour appeler directement.</div>`;
 }
 
@@ -1059,6 +1108,250 @@ function removePhoto(childId){
   const c=childList().find(x=>x.id===childId); if(!c) return; c.photo=''; persistChildren();
   if(VIEW==='profile') renderProfile(); toast('Photo retirée');
 }
+
+/* ---------- OBSERVATIONS (suivi du développement) ---------- */
+const K_OBS='nounou.observations.v1';
+let OBS = LS.get(K_OBS, {});
+function persistObs(){ if(usingDemo) return; LS.set(K_OBS, OBS); }
+const OBS_DOMCOL=['#EFA636','#47978A','#4A97E0','#6FBE4E','#E77FAE'];
+const OBS_CONTEXT=["jeu libre","activité","repas","sommeil","extérieur","transition","autre"];
+const OBS_SUITE=["aucune","poursuivre l'observation","adapter l'accompagnement","échange avec les parents à envisager","avis PMI/RPE/professionnel à envisager"];
+const OBS_PRINCIPE="Cette fiche aide à observer l'évolution de l'enfant. Les repères sont indicatifs : ils ne constituent ni un diagnostic ni une obligation de réussite à un âge précis.";
+const OBS_IMPORTANT="Une observation isolée ne permet pas de conclure. Une perte d'une compétence acquise, une non-progression ou plusieurs signes concordants justifient de demander un avis professionnel. Les professionnels de la petite enfance peuvent contribuer au repérage mais ne posent pas de diagnostic.";
+const GRID_LABEL={"12-18":"12–18 mois","18-24":"18–24 mois","24-36":"24–36 mois"};
+const GRIDS={
+ "12-18":[
+  {t:"Motricité globale",items:["se met debout / se déplace","marche avec ou sans aide","s'accroupit / se relève","grimpe / franchit de petits obstacles","pousse / tire / lance"],v:"Repères variables selon l'enfant. À réobserver surtout si les acquisitions cessent de progresser ou si une compétence acquise est perdue."},
+  {t:"Motricité fine",items:["pince pouce-index","saisit / relâche volontairement","empile / encastre","tourne les pages","manipule des objets de façons variées"],v:"À observer dans plusieurs situations ; les différences individuelles sont importantes."},
+  {t:"Communication & langage",items:["babille / vocalise","utilise des gestes sociaux","pointe / montre / désigne","comprend des demandes simples","utilise des mots ou formes de communication intentionnelles"],v:"Point d'alerte : absence de babillage, de pointage ou d'autres gestes sociaux à 12 mois ; absence de mots à 18 mois. Ces éléments appellent un avis professionnel, pas un diagnostic par l'accueillante."},
+  {t:"Socialisation & jeu",items:["regarde l'adulte","imite","cherche à partager une découverte","réagit aux autres","explore et expérimente","utilise les objets dans le jeu"],v:"À réobserver si très peu d'engagement social, absence d'imitation ou absence persistante de progression."},
+  {t:"Émotions / autonomie / sensorialité",items:["exprime ses émotions","cherche du réconfort","participe aux routines","mange / boit avec aide ou seul","réagit aux sons / textures / mouvements"],v:"Les réactions et préférences sensorielles sont très variables. Noter surtout leur fréquence, contexte et retentissement."}
+ ],
+ "18-24":[
+  {t:"Motricité globale",items:["marche avec assurance","court / change de direction","monte quelques marches avec aide","shoote / lance un ballon","grimpe / franchit des obstacles"],v:"Repères variables. À discuter si absence de progression, difficultés très importantes dans plusieurs situations ou régression."},
+  {t:"Motricité fine & autonomie",items:["encastre / empile","tourne / ouvre / ferme","utilise une cuillère","participe à l'habillage","participe au lavage des mains","essaie de faire seul"],v:"L'autonomie progresse par étapes. Observer les occasions données à l'enfant avant d'interpréter une difficulté."},
+  {t:"Langage & communication",items:["vocabulaire qui s'enrichit","comprend des consignes simples","nomme / désigne","demande par gestes ou mots","associe progressivement des mots"],v:"Point d'alerte classique : absence d'association de mots à 24 mois. Une inquiétude parentale ou une non-progression mérite également d'être prise en compte."},
+  {t:"Socialisation / jeu symbolique",items:["imite les adultes","joue à côté des autres","participe brièvement à un jeu partagé","fait semblant dans le jeu","cherche l'adulte pour partager"],v:"À observer si absence d'imitation, très peu d'attention conjointe ou absence de progression dans les échanges sociaux."},
+  {t:"Émotions / transitions / sensorialité",items:["exprime fortement frustration / joie","accepte progressivement les limites","a besoin de rituels","s'adapte aux transitions","réagit à certains stimuli"],v:"Les colères et l'opposition sont fréquentes à cet âge et ne constituent pas, à elles seules, un signal d'alerte. Regarder fréquence, intensité, contexte et récupération."}
+ ],
+ "24-36":[
+  {t:"Motricité globale",items:["court","monte les escaliers avec aide puis davantage seul","saute progressivement","lance / shoote un ballon","grimpe / coordonne ses mouvements"],v:"À réobserver si absence de progression, grande difficulté dans plusieurs situations ou perte d'une compétence."},
+  {t:"Motricité fine & autonomie",items:["construit / encastre","dessine des traces","manipule de petits objets","utilise des couverts","participe à l'habillage","range avec aide","réalise certaines routines seul"],v:"La vitesse d'acquisition varie. Observer la possibilité de progresser avec accompagnement."},
+  {t:"Langage / communication",items:["associe des mots","construit des phrases de plus en plus longues","comprend des consignes","pose / répond à des questions simples","se fait comprendre progressivement","utilise le langage pour partager"],v:"Une absence persistante d'association de mots après 24 mois est un signal d'alerte. Une perte de langage ou de compétences sociales à tout âge nécessite une consultation rapide."},
+  {t:"Socialisation / jeu symbolique",items:["jeu de faire-semblant","imite des scènes du quotidien","commence des jeux partagés","prend en compte l'autre","demande de l'aide / partage une découverte"],v:"À approfondir si absence persistante d'imitation, de jeu symbolique ou d'échanges sociaux, surtout si plusieurs domaines sont concernés."},
+  {t:"Émotions / attention / adaptation",items:["se calme avec aide","accepte progressivement les transitions","reste engagé dans une activité","change d'activité avec accompagnement","exprime besoins / émotions"],v:"À observer dans le temps. Ne pas confondre tempérament, fatigue, contexte et difficulté développementale."}
+ ]
+};
+const ALERT_INTRO="Cette page sert à guider l'observation, pas à dépister ou diagnostiquer. La HAS recommande de considérer toute régression ou non-progression des acquisitions comme un signe d'appel, quel que soit l'âge, ainsi que toute inquiétude exprimée par les parents.";
+const ALERT_ROWS=[
+ ["Variation individuelle","Observer dans différents contextes et noter les occasions données à l'enfant. Une acquisition peut apparaître plus tôt ou plus tard."],
+ ["Point à réobserver","Noter date, contexte, fréquence, ce qui précède et ce qui aide. Refaire une observation après un délai adapté."],
+ ["Plusieurs domaines concernés","Partager les observations factuelles avec les parents et envisager un échange avec PMI/RPE ou le professionnel référent selon la situation."],
+ ["Régression / perte d'une compétence acquise","Ne pas attendre simplement « de voir si ça passe » : en parler aux parents et recommander un avis médical/professionnel."],
+ ["Absence de babillage, pointage ou gestes sociaux à 12 mois","Élément d'alerte décrit dans les recommandations ; à transmettre aux parents pour avis professionnel."],
+ ["Absence de mots à 18 mois","Élément d'alerte décrit dans les recommandations ; avis professionnel à solliciter."],
+ ["Absence d'association de mots à 24 mois","Élément d'alerte décrit dans les recommandations ; avis professionnel à solliciter."],
+ ["Inquiétude parentale à tout âge","La HAS indique qu'une inquiétude des parents concernant le neurodéveloppement constitue un signe d'appel et doit être prise en compte."]
+];
+const ALERT_NOT="Ce qui n'est PAS, à lui seul, un signal d'alerte : une colère, une préférence alimentaire, un sommeil difficile, le fait de jouer seul par moments, une forte activité motrice, une acquisition plus tardive ou une sensibilité particulière. Le contexte, la fréquence, l'intensité, la progression et l'association éventuelle avec d'autres signes sont essentiels.";
+const ALERT_REFS="Références officielles : Haute Autorité de Santé, « Troubles du neurodéveloppement – Repérage et orientation des enfants à risque » (2020) ; HAS, « Trouble du spectre de l'autisme – Signes d'alerte, repérage, diagnostic et évaluation » (2018) ; Ministère chargé de la Santé, repères développementaux et documents de suivi. Ces repères ne remplacent pas les examens médicaux obligatoires, le carnet de santé ni l'évaluation d'un médecin ou d'un professionnel spécialisé.";
+
+function ageMonths(bd){ if(!bd) return null; const p=bd.split('-').map(Number); const b=new Date(p[0],p[1]-1,p[2]); const n=new Date(); let m=(n.getFullYear()-b.getFullYear())*12+(n.getMonth()-b.getMonth()); if(n.getDate()<b.getDate()) m--; return m<0?0:m; }
+function gridForAge(m){ if(m==null) return "12-18"; if(m<18) return "12-18"; if(m<24) return "18-24"; return "24-36"; }
+function obsForChild(childId){ return Object.values(OBS).filter(o=>o.childId===childId).sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:(b.createdAt||0)-(a.createdAt||0)); }
+function obsProgress(o){ const g=GRIDS[o.grid]||[]; let tot=0,ok=0; g.forEach((d,di)=>d.items.forEach((it,ii)=>{ tot++; if(o.items[di+'-'+ii]) ok++; })); return {ok,tot}; }
+
+let OBSLIST_CHILD=null, OBS_CARD_FROM='home', CUR_OBS_ID=null;
+function openObsList(childId){ if(isDemoId(childId)){ toast('Ajoute un vrai enfant pour créer des observations 🙂'); return; } OBSLIST_CHILD=childId; OBS_CARD_FROM=(CARD_CTX&&CARD_CTX.from)||'home'; renderObsList(); setView('obslist'); }
+function renderObsList(){
+  const c=childList().find(x=>x.id===OBSLIST_CHILD); const list=obsForChild(OBSLIST_CHILD);
+  const b=document.getElementById('obslistBody');
+  b.innerHTML=`
+   <div class="page-h"><div><h1>Observations</h1><div class="sub">${esc(c?c.name:'')} · suivi du développement</div></div></div>
+   <div class="banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><div>Espace <b>confidentiel</b> : ces fiches ne sont pas envoyées aux parents avec la journée. Tu peux les exporter en PDF à la demande.</div></div>
+   <button class="btn btn-primary" onclick="newObs()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Nouvelle observation</button>
+   <div id="obsItems" style="margin-top:14px"></div>
+   ${list.length?`<button class="btn btn-ghost" style="margin-top:6px" onclick="generateBilan('${OBSLIST_CHILD}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 14l2 2 4-4"/></svg>Bilan de synthèse (PDF)</button>`:''}
+   <button class="btn btn-ghost" style="margin-top:6px" onclick="openObsAlert()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>Repères d'alerte (à consulter)</button>`;
+  const host=b.querySelector('#obsItems');
+  if(!list.length){ host.innerHTML='<div class="empty-mini">Aucune observation pour l\'instant. Touche « Nouvelle observation » pour commencer.</div>'; return; }
+  list.forEach(o=>{
+    const pr=obsProgress(o); const row=document.createElement('button'); row.className='hist-day';
+    row.innerHTML=`<div class="avatar" style="background:${OBS_DOMCOL[1]};width:38px;height:38px;border-radius:11px"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></div>
+      <div><div class="d">${capitalize(longDate(o.date))}</div><div class="p">Grille ${GRID_LABEL[o.grid]} · ${pr.ok}/${pr.tot} observé(s)</div></div>
+      <svg class="chevrers" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>`;
+    row.onclick=()=>openObs(o.id); host.appendChild(row);
+  });
+}
+function newObs(){
+  const c=childList().find(x=>x.id===OBSLIST_CHILD); const m=ageMonths(c&&c.birthdate); const grid=gridForAge(m);
+  const id='obs'+Date.now()+Math.floor(Math.random()*9999);
+  OBS[id]={id,childId:OBSLIST_CHILD,date:todayKey(),grid,context:{},contextAutre:'',items:{},notes:{},remarques:'',suite:{},createdAt:Date.now(),updatedAt:Date.now()};
+  persistObs(); openObs(id);
+}
+function openObs(id){ CUR_OBS_ID=id; renderObsEdit(); setView('obsedit'); }
+function curObs(){ return OBS[CUR_OBS_ID]; }
+function renderObsEdit(){
+  const o=curObs(); if(!o){ goHome(); return; }
+  const c=childList().find(x=>x.id===o.childId); const m=ageMonths(c&&c.birthdate);
+  const b=document.getElementById('obseditBody');
+  b.innerHTML=`
+   <div class="page-h"><div><h1>Observation</h1><div class="sub">${esc(c?c.name:'')}${m!=null?' · '+m+' mois':''}</div></div></div>
+   <div class="group">
+     <h3><span class="gd" style="background:#47978A"></span>Fiche</h3>
+     <div class="two">
+       <div class="field"><label>Date de l'observation</label><input id="o-date" type="date" value="${esc(o.date)}"></div>
+       <div class="field"><label>Grille (selon l'âge)</label><select id="o-grid" class="oselect">${Object.keys(GRIDS).map(g=>`<option value="${g}" ${o.grid===g?'selected':''}>${GRID_LABEL[g]}</option>`).join('')}</select></div>
+     </div>
+     <div class="field"><label>Contexte</label><div class="togglerow" id="o-ctx"></div><input id="o-ctxautre" placeholder="Autre contexte (facultatif)" value="${esc(o.contextAutre)}" style="margin-top:4px"></div>
+   </div>
+   <div class="ovig" style="margin:-4px 2px 12px">${esc(OBS_PRINCIPE)}</div>
+   <div id="o-domains"></div>
+   <div class="group">
+     <h3><span class="gd" style="background:#6FBE4E"></span>Remarques / observations complémentaires</h3>
+     <div class="field"><textarea id="o-rem" rows="4" placeholder="Notes libres…">${esc(o.remarques)}</textarea></div>
+   </div>
+   <div class="group">
+     <h3><span class="gd" style="background:#4A97E0"></span>Suite à donner</h3>
+     <div class="togglerow" id="o-suite"></div>
+   </div>
+   <div class="ovig" style="margin:2px">${esc(OBS_IMPORTANT)}</div>`;
+  // date + grid
+  b.querySelector('#o-date').addEventListener('change',e=>{ o.date=e.target.value||todayKey(); o.updatedAt=Date.now(); persistObs(); });
+  b.querySelector('#o-grid').addEventListener('change',e=>{ o.grid=e.target.value; o.items={}; o.notes={}; o.updatedAt=Date.now(); persistObs(); renderObsEdit(); });
+  b.querySelector('#o-ctxautre').addEventListener('input',e=>{ o.contextAutre=e.target.value; o.updatedAt=Date.now(); persistObs(); });
+  b.querySelector('#o-rem').addEventListener('input',e=>{ o.remarques=e.target.value; o.updatedAt=Date.now(); persistObs(); });
+  // context toggles
+  const ctx=b.querySelector('#o-ctx');
+  OBS_CONTEXT.filter(x=>x!=='autre').forEach((label,i)=>{ const on=!!o.context[i]; const t=document.createElement('button'); t.className='tg'+(on?' on':''); t.innerHTML=`<span class="tdot" style="background:${on?'#47978A':'var(--line)'}"></span>${label}`; t.onclick=()=>{ o.context[i]=!o.context[i]; t.classList.toggle('on',o.context[i]); t.querySelector('.tdot').style.background=o.context[i]?'#47978A':'var(--line)'; o.updatedAt=Date.now(); persistObs(); }; ctx.appendChild(t); });
+  // suite toggles
+  const su=b.querySelector('#o-suite');
+  OBS_SUITE.forEach((label,i)=>{ const on=!!o.suite[i]; const t=document.createElement('button'); t.className='tg'+(on?' on':''); t.innerHTML=`<span class="tdot" style="background:${on?'#4A97E0':'var(--line)'}"></span>${label}`; t.onclick=()=>{ o.suite[i]=!o.suite[i]; t.classList.toggle('on',o.suite[i]); t.querySelector('.tdot').style.background=o.suite[i]?'#4A97E0':'var(--line)'; o.updatedAt=Date.now(); persistObs(); }; su.appendChild(t); });
+  // domains
+  const dh=b.querySelector('#o-domains');
+  (GRIDS[o.grid]||[]).forEach((dom,di)=>{
+    const col=OBS_DOMCOL[di%OBS_DOMCOL.length];
+    const g=document.createElement('div'); g.className='group ogroup'; g.style.setProperty('--accentc',col);
+    g.innerHTML=`<h3><span class="gd" style="background:${col}"></span>${di+1}. ${esc(dom.t)}</h3><div class="oitems"></div>
+      <div class="ovig"><b>Point de vigilance —</b> ${esc(dom.v)}</div>
+      <div class="field" style="margin-top:8px"><label>Précisions (facultatif)</label><textarea rows="2" data-note="${di}" placeholder="Ex. contexte, fréquence, ce qui aide…">${esc(o.notes[di]||'')}</textarea></div>`;
+    const oi=g.querySelector('.oitems');
+    dom.items.forEach((it,ii)=>{ const key=di+'-'+ii; const on=!!o.items[key];
+      const row=document.createElement('div'); row.className='oitem'+(on?' on':'');
+      row.innerHTML=`<span class="ocheck"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span><span class="otxt">${esc(it)}</span>`;
+      row.onclick=()=>{ o.items[key]=!o.items[key]; row.classList.toggle('on',o.items[key]); o.updatedAt=Date.now(); persistObs(); };
+      oi.appendChild(row);
+    });
+    g.querySelector('textarea[data-note]').addEventListener('input',e=>{ o.notes[di]=e.target.value; o.updatedAt=Date.now(); persistObs(); });
+    dh.appendChild(g);
+  });
+}
+function deleteObs(){
+  const o=curObs(); if(!o) return;
+  openModal(`<h3>Supprimer cette observation ?</h3><p>Elle sera définitivement effacée de l'historique.</p>
+   <div class="btn-row"><button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+   <button class="btn" style="background:var(--danger);color:#fff" onclick="doDeleteObs()">Supprimer</button></div>`);
+}
+function doDeleteObs(){ const o=curObs(); if(o){ delete OBS[o.id]; persistObs(); } closeModal(); openObsList(OBSLIST_CHILD); toast('Observation supprimée'); }
+function finishObs(){ openObsList(curObs()?curObs().childId:OBSLIST_CHILD); toast('Observation enregistrée ✅'); }
+
+function openObsAlert(){ renderObsAlert(); setView('obsalert'); }
+function renderObsAlert(){
+  document.getElementById('obsalertBody').innerHTML=`
+   <div class="page-h"><div><h1>Repères d'alerte</h1><div class="sub">À utiliser avec prudence</div></div></div>
+   <div class="ovig" style="margin:0 2px 12px">${esc(ALERT_INTRO)}</div>
+   ${ALERT_ROWS.map(r=>`<div class="group" style="padding:12px 14px;margin-bottom:10px"><div style="font-weight:800;font-size:14.5px;margin-bottom:4px">${esc(r[0])}</div><div style="font-size:13.5px;color:var(--muted);font-weight:600;line-height:1.45">${esc(r[1])}</div></div>`).join('')}
+   <div class="pinfo" style="margin:6px 2px">${esc(ALERT_NOT)}</div>
+   <div class="ovig" style="margin:12px 2px">${esc(ALERT_REFS)}</div>`;
+}
+
+/* observation PDF sheet */
+function osheetHTML(o){
+  const c=childList().find(x=>x.id===o.childId); const m=ageMonths(c&&c.birthdate);
+  const ctx=OBS_CONTEXT.filter((l,i)=>l!=='autre'&&o.context[i]).map(l=>l); if(o.contextAutre) ctx.push(o.contextAutre);
+  const suite=OBS_SUITE.filter((l,i)=>o.suite[i]);
+  const doms=(GRIDS[o.grid]||[]).map((dom,di)=>{
+    const col=OBS_DOMCOL[di%OBS_DOMCOL.length];
+    const items=dom.items.map((it,ii)=>{ const on=!!o.items[di+'-'+ii]; return `<div class="o-it"><span class="mk" style="color:${on?col:'#c9c2b6'}">${on?'☑':'☐'}</span> <span style="${on?'font-weight:700':'color:#8a8177'}">${esc(it)}</span></div>`; }).join('');
+    const note=o.notes[di]&&o.notes[di].trim()?`<div class="o-note"><b>Précisions :</b> ${esc(o.notes[di])}</div>`:'';
+    return `<div class="o-dom"><div class="o-dh" style="color:${col}">${di+1}. ${esc(dom.t)}</div>${items}${note}<div class="o-vig"><b>Point de vigilance —</b> ${esc(dom.v)}</div></div>`;
+  }).join('');
+  return `<div class="osheet" id="theOsheet">
+    <h1>Observations — ${GRID_LABEL[o.grid]}</h1>
+    <div class="o-sub">${esc(c?c.name:'')}${c&&c.birthdate?' · né(e) le '+frDate(c.birthdate):''}${m!=null?' · '+m+' mois':''} · ${longDate(o.date)}</div>
+    <div class="o-princ">${esc(OBS_PRINCIPE)}</div>
+    <div class="o-ctx"><b>Contexte :</b> ${ctx.length?esc(ctx.join(', ')):'—'}</div>
+    ${doms}
+    <div class="o-dom"><div class="o-dh" style="color:#6FBE4E">Remarques / observations complémentaires</div><div class="o-rem">${o.remarques&&o.remarques.trim()?esc(o.remarques).replace(/\n/g,'<br>'):'—'}</div></div>
+    <div class="o-ctx"><b>Suite à donner :</b> ${suite.length?esc(suite.join(', ')):'—'}</div>
+    <div class="o-imp">${esc(OBS_IMPORTANT)}</div>
+    <div class="s-foot" style="margin-top:20px">Document confidentiel — transmis par Nounou</div>
+  </div>`;
+}
+async function makeSheetPdf(htmlString){
+  const holder=document.createElement('div'); holder.style.cssText='position:fixed;left:-10000px;top:0;width:794px;background:#fff;'; holder.innerHTML=htmlString; document.body.appendChild(holder);
+  const sheet=holder.firstElementChild; await document.fonts.ready.catch(()=>{});
+  try{ const canvas=await html2canvas(sheet,{scale:2,backgroundColor:'#ffffff',useCORS:true,windowWidth:794}); const {jsPDF}=window.jspdf; const pdf=new jsPDF('p','pt','a4'); const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight(); const imgW=pw,imgH=canvas.height*imgW/canvas.width; const img=canvas.toDataURL('image/jpeg',0.94); let hLeft=imgH; pdf.addImage(img,'JPEG',0,0,imgW,imgH); hLeft-=ph; while(hLeft>0){ const pos=hLeft-imgH; pdf.addPage(); pdf.addImage(img,'JPEG',0,pos,imgW,imgH); hLeft-=ph; } return pdf.output('blob'); }
+  finally{ document.body.removeChild(holder); }
+}
+async function shareSheetPdf(htmlString,fname,text){
+  toast('Préparation du PDF…');
+  let blob; try{ blob=await makeSheetPdf(htmlString); }catch(e){ console.error(e); toast('Souci lors du PDF.'); return; }
+  const file=new File([blob],fname,{type:'application/pdf'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file],title:fname,text:text||''}); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
+  let opened=false; try{ const u=URL.createObjectURL(blob); opened=!!window.open(u,'_blank'); setTimeout(()=>URL.revokeObjectURL(u),8000); }catch(e){}
+  if(!opened) downloadBlob(blob,fname);
+  toast(opened?'Touche Partager sur le PDF 📎':'Ouvre l\'app depuis l\'écran d\'accueil pour l\'envoi');
+}
+function exportObs(){ const o=curObs(); if(!o) return; const c=childList().find(x=>x.id===o.childId); shareSheetPdf(osheetHTML(o), 'Observations '+(c?c.name:'enfant')+' '+o.date+'.pdf', 'Observations — '+(c?c.name:'')); }
+
+/* ---------- Bilan de synthèse ---------- */
+function bilanFirstDates(childId,bracket){
+  const obs=obsForChild(childId).filter(o=>o.grid===bracket).slice().sort((a,b)=> a.date<b.date?-1:a.date>b.date?1:0);
+  const g=GRIDS[bracket]||[]; const first={};
+  g.forEach((d,di)=>d.items.forEach((it,ii)=>{ const key=di+'-'+ii; for(const o of obs){ if(o.items[key]){ first[key]=o.date; break; } } }));
+  return {obs,first};
+}
+function bsheetHTML(childId,brackets){
+  const c=childList().find(x=>x.id===childId); const m=ageMonths(c&&c.birthdate); let body='';
+  brackets.forEach(bk=>{
+    const {obs,first}=bilanFirstDates(childId,bk); if(!obs.length) return;
+    const dates=obs.map(o=>frDate(o.date)).join(', ');
+    let doms='';
+    (GRIDS[bk]||[]).forEach((dom,di)=>{
+      const col=OBS_DOMCOL[di%OBS_DOMCOL.length];
+      const items=dom.items.map((it,ii)=>{ const key=di+'-'+ii; const fd=first[key]; return `<div class="o-it"><span class="mk" style="color:${fd?col:'#c9c2b6'}">${fd?'☑':'☐'}</span> <span style="${fd?'font-weight:700':'color:#8a8177'}">${esc(it)}</span>${fd?`<span class="dt">— observé le ${frDate(fd)}</span>`:''}</div>`; }).join('');
+      const notes=obs.filter(o=>o.notes[di]&&o.notes[di].trim()).map(o=>frDate(o.date)+' : '+esc(o.notes[di]));
+      const note=notes.length?`<div class="o-note"><b>Précisions :</b> ${notes.join(' · ')}</div>`:'';
+      doms+=`<div class="o-dom"><div class="o-dh" style="color:${col}">${di+1}. ${esc(dom.t)}</div>${items}${note}<div class="o-vig"><b>Point de vigilance —</b> ${esc(dom.v)}</div></div>`;
+    });
+    const rems=obs.filter(o=>o.remarques&&o.remarques.trim()).map(o=>`<div style="margin-bottom:5px"><b>${frDate(o.date)} :</b> ${esc(o.remarques)}</div>`).join('')||'—';
+    const suites=[...new Set(obs.reduce((a,o)=>a.concat(OBS_SUITE.filter((l,i)=>o.suite[i])),[]))];
+    body+=`<div class="b-bracket"><div class="b-bh">Tranche ${GRID_LABEL[bk]} — ${obs.length} observation(s)</div>
+      <div class="o-ctx"><b>Observations prises en compte :</b> ${dates}</div>${doms}
+      <div class="o-dom"><div class="o-dh" style="color:#6FBE4E">Remarques au fil des observations</div><div class="o-rem">${rems}</div></div>
+      <div class="o-ctx"><b>Suites évoquées :</b> ${suites.length?esc(suites.join(', ')):'—'}</div></div>`;
+  });
+  return `<div class="osheet">
+    <h1>Bilan de synthèse</h1>
+    <div class="o-sub">${esc(c?c.name:'')}${c&&c.birthdate?' · né(e) le '+frDate(c.birthdate):''}${m!=null?' · '+m+' mois':''} · établi le ${longDate(todayKey())}</div>
+    <div class="o-princ">${esc(OBS_PRINCIPE)} Ce bilan réunit les observations faites au fil du temps ; ✓ indique la date de la première fois où la compétence a été observée.</div>
+    ${body||'<div class="o-ctx">Aucune observation à synthétiser.</div>'}
+    <div class="o-imp">${esc(OBS_IMPORTANT)}</div>
+    <div class="s-foot" style="margin-top:20px">Document confidentiel — transmis par Nounou</div>
+  </div>`;
+}
+function generateBilan(childId){
+  const order=Object.keys(GRIDS);
+  const avail=[...new Set(obsForChild(childId).map(o=>o.grid))].sort((a,b)=>order.indexOf(a)-order.indexOf(b));
+  if(!avail.length){ toast('Aucune observation à synthétiser.'); return; }
+  let html=`<h3>Bilan de synthèse</h3><p>Que doit couvrir le document ?</p><div style="display:flex;flex-direction:column;gap:9px">`;
+  if(avail.length>1) html+=`<button class="btn btn-primary" onclick="doBilan('${childId}','${avail.join(',')}')">Bilan complet (toutes les tranches)</button>`;
+  avail.forEach(bk=>{ html+=`<button class="btn ${avail.length>1?'btn-ghost':'btn-primary'}" onclick="doBilan('${childId}','${bk}')">Bilan ${GRID_LABEL[bk]}</button>`; });
+  html+=`<button class="btn btn-ghost" onclick="closeModal()">Annuler</button></div>`;
+  openModal(html);
+}
+function doBilan(childId,bracketsStr){ closeModal(); const brackets=bracketsStr.split(','); const c=childList().find(x=>x.id===childId); shareSheetPdf(bsheetHTML(childId,brackets), 'Bilan '+(c?c.name:'enfant')+' '+todayKey()+'.pdf', 'Bilan de synthèse — '+(c?c.name:'')); }
 
 /* ---------- Init ---------- */
 try{ if(navigator.storage && navigator.storage.persist){ navigator.storage.persist().catch(()=>{}); } }catch(e){}
